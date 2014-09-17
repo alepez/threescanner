@@ -109,10 +109,7 @@ $(HEADERS_DIST_DIR)/%.h: $(LIB_SRC_DIR)/%.h
 	cp $< $@
 
 test:
-	@echo $(EXECUTABLES)
-	@echo $(EXECUTABLES_DIST)
-	@echo $(EXECUTABLES_OBJS)
-
+	for testScript in $(wildcard test/scripts/*); do $$testScript; done
 
 executables: $(EXECUTABLES)
 

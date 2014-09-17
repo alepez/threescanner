@@ -10,18 +10,6 @@
 
 namespace threescanner {
 
-Engine* Engine::create(const Config& cfg) {
-	auto type = cfg.get<std::string>("type");
-	if (type == "threephase") {
-		return new ThreephaseEngine(cfg);
-	}
-	return nullptr;
-}
-
-void Engine::destroy(Engine* obj) {
-	delete obj;
-}
-
 Engine::Engine(const Config&) {
 
 }

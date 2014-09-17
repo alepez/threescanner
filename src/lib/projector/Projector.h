@@ -12,10 +12,6 @@
 namespace threescanner {
 
 class Projector {
-public:
-public:
-	static Projector* create(const Config& cfg);
-	static void destroy(Projector*);
 protected:
 	Projector(const Config&);
 	virtual ~Projector();

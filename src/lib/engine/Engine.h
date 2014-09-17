@@ -12,9 +12,6 @@
 namespace threescanner {
 
 class Engine {
-public:
-	static Engine* create(const Config& cfg);
-	static void destroy(Engine*);
 protected:
 	Engine(const Config&);
 	virtual ~Engine();
