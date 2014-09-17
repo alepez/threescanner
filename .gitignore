@@ -1,0 +1,11 @@
+## eclipse
+.project
+.cproject
+/.settings
+
+## ctags
+.tags
+
+## automatically generated files
+/build
+/dist
