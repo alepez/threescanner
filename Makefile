@@ -73,22 +73,26 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 test:
 	@echo $(OBJS)
 	@echo $(OBJS_DIRS)
+	@echo $(LIB_SHARED) $(LIB_STATIC)
 
-all: $(LIB_SHARED)
+all: $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLE)
 
 $(OBJS): | $(OBJS_DIRS)
 
-$(OBJS_DIRS):
+$(BIN_DIST_DIR) $(LIB_DIST_DIR) $(OBJS_DIRS):
 	mkdir -p $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(LIB_SHARED): $(OBJS)
-	$(CXX) -shared -o $(TARGET) $(OBJS) $(LDFLAGS)
+$(EXECUTABLE): $(OBJS) $(BIN_DIST_DIR)
+	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 
-$(LIB_STATIC): $(OBJS)
-	ar rcs $(TARGET) $(OBJS)
+$(LIB_SHARED): $(OBJS) $(LIB_DIST_DIR)
+	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
+
+$(LIB_STATIC): $(OBJS) $(LIB_DIST_DIR)
+	ar rcs $@ $(OBJS)
 
 clean:
-	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC)
+	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLE)
