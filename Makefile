@@ -78,7 +78,35 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 ###############################################################################
 ## TARGETS
 
-.PHONY: all test clean distclean includes libraries executables
+.PHONY: all test clean distclean includes libraries executables default
+
+default: test
+
+## build single object
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@  -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" $<
+
+## build executable
+$(EXECUTABLES): $(OBJS)
+	mkdir -p $(BIN_DIST_DIR)
+	$(CXX) $(CXXFLAGS) -c -o $(BUILD_DIR)/$@.o $(SRC_DIR)/$@.cpp
+	$(CXX) -o $(BIN_DIST_DIR)/$(PROJECT)-$@ $(LDFLAGS) $(BUILD_DIR)/$@.o
+
+## build shared library
+$(LIB_SHARED): $(OBJS)
+	mkdir -p $(LIB_DIST_DIR)
+	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
+
+## build static library
+$(LIB_STATIC): $(OBJS)
+	mkdir -p $(LIB_DIST_DIR)
+	ar rcs $@ $(OBJS)
+
+## copy headers to dist/include
+$(HEADERS_DIST_DIR)/%.h: $(LIB_SRC_DIR)/%.h
+	mkdir -p $(dir $@)
+	cp $< $@
 
 test:
 	@echo $(EXECUTABLES)
@@ -91,47 +119,24 @@ test:
 	@echo $(OBJS_DIRS)
 	@echo $(LIB_SHARED) $(LIB_STATIC)
 
-all: libraries executables
-
-## create build directories tree
-$(BIN_DIST_DIR) $(LIB_DIST_DIR) $(OBJS_DIRS):
-	mkdir -p $@
-
-## create build directories tree before objects
-$(OBJS): | $(OBJS_DIRS)
-
-## build single object
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@  -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" $<
-
-## build executable
-$(EXECUTABLES): $(OBJS) $(BIN_DIST_DIR)
-	$(CXX) $(CXXFLAGS) -c -o $(BUILD_DIR)/$@.o $(SRC_DIR)/$@.cpp
-	$(CXX) -o $(BIN_DIST_DIR)/$(PROJECT)-$@ $(LDFLAGS) $(BUILD_DIR)/$@.o
-
-## build shared library
-$(LIB_SHARED): $(OBJS) $(LIB_DIST_DIR)
-	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
-
-## build static library
-$(LIB_STATIC): $(OBJS) $(LIB_DIST_DIR)
-	ar rcs $@ $(OBJS)
-
-## copy headers to dist/include
-$(HEADERS_DIST_DIR)/%.h: $(SRC_DIR)/%.h
-	mkdir -p $(dir $@)
-	cp $< $@
-
 executables: $(EXECUTABLES)
 
 libraries: $(LIB_STATIC) $(LIB_SHARED)
 
 includes: $(HEADERS_DIST)
 
+## build libraries and executables
+all: libraries executables
+
+## build libraries executables and miscellaneus
+dist: all includes
+
+## clean libraries and executables
 clean:
 	rm -f $(OBJS) $(CXX_DEPS)  $(EXECUTABLES_OBJS)
 	rm -f $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLES_DIST)
 
+## clean everything
 distclean: clean
 	rm -rf $(DIST_DIR) $(BUILD_DIR)
 
