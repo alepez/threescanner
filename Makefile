@@ -3,23 +3,23 @@ PROJECT := threephase
 ## DIRECTORIES
 SRC_DIR := src
 BUILD_DIR := build
+DIST_DIR := dist
 
 ## LIBRARIES OUTPUT
-LIB_BUILD_DIR := $(BUILD_DIR)/lib
-LIB_SHARED := $(LIB_BUILD_DIR)/lib$(PROJECT).so
-LIB_STATIC := $(LIB_BUILD_DIR)/lib$(PROJECT).a
+LIB_DIST_DIR := $(DIST_DIR)/lib
+LIB_SHARED := $(LIB_DIST_DIR)/lib$(PROJECT).so
+LIB_STATIC := $(LIB_DIST_DIR)/lib$(PROJECT).a
 
 ## EXECUTABLES OUTPUT
-BIN_BUILD_DIR := $(BUILD_DIR)/bin
-BIN := $(BIN_BUILD_DIR)/$(PROJECT)
+BIN_DIST_DIR := $(DIST_DIR)/bin
+EXECUTABLE := $(BIN_DIST_DIR)/$(PROJECT)
 
 ## SOURCES
-CXX_SRCS := $(shell find $(SRC_DIR) -name "*.cpp")
-HXX_SRCS := $(shell find $(SRC_DIR) -name "*.h")
+CXX_SRC := $(shell find $(SRC_DIR) -name "*.cpp")
+HXX_SRC := $(shell find $(SRC_DIR) -name "*.h")
 
 ## OBJECTS
-CXX_OBJS := $(addprefix $(BUILD_DIR)/, ${CXX_SRCS:.cpp=.o})
-OBJ_BUILD_DIR := $(BUILD_DIR)/src
+CXX_OBJS := $(addprefix $(BUILD_DIR)/, $(patsubst src/%,%,$(patsubst %.cpp,%.o,$(CXX_SRC))))
 OBJS := $(CXX_OBJS)
 
 ## INCLUDES
@@ -65,13 +65,16 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 ###############################################################################
 ## TARGETS
 
+all: $(LIB_SHARED)
+
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
 $(LIB_SHARED): $(OBJS)
 	$(CXX) -shared -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 $(LIB_STATIC): $(OBJS)
 	ar rcs $(TARGET) $(OBJS)
-
-all: $(LIB_SHARED) $(LIB_STATIC)
 
 clean:
 	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC)
