@@ -19,8 +19,11 @@ CXX_SRC := $(shell find $(SRC_DIR) -name "*.cpp")
 HXX_SRC := $(shell find $(SRC_DIR) -name "*.h")
 
 ## OBJECTS
+CXX_DEPS := $(addprefix $(BUILD_DIR)/, $(patsubst src/%,%,$(patsubst %.cpp,%.d,$(CXX_SRC))))
 CXX_OBJS := $(addprefix $(BUILD_DIR)/, $(patsubst src/%,%,$(patsubst %.cpp,%.o,$(CXX_SRC))))
+
 OBJS := $(CXX_OBJS)
+OBJS_DIRS := $(dir $(OBJS))
 
 ## INCLUDES
 INCLUDE_DIRS += ./src
@@ -65,7 +68,18 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 ###############################################################################
 ## TARGETS
 
+.PHONY: all test clean
+
+test:
+	@echo $(OBJS)
+	@echo $(OBJS_DIRS)
+
 all: $(LIB_SHARED)
+
+$(OBJS): | $(OBJS_DIRS)
+
+$(OBJS_DIRS):
+	mkdir -p $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
