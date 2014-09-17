@@ -69,7 +69,7 @@ else
 endif
 
 COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
-EXTRA_FLAGS += -pthread -fPIC
+EXTRA_FLAGS += -pthread -fPIC -std=c++11
 
 CXXFLAGS = $(EXTRA_FLAGS) $(COMMON_FLAGS) $(WARNINGS)
 
