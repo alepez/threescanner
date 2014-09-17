@@ -5,15 +5,6 @@ SRC_DIR := src
 BUILD_DIR := build
 DIST_DIR := dist
 
-## LIBRARIES OUTPUT
-LIB_DIST_DIR := $(DIST_DIR)/lib
-LIB_SHARED := $(LIB_DIST_DIR)/lib$(PROJECT).so
-LIB_STATIC := $(LIB_DIST_DIR)/lib$(PROJECT).a
-
-## EXECUTABLES OUTPUT
-BIN_DIST_DIR := $(DIST_DIR)/bin
-EXECUTABLE := $(BIN_DIST_DIR)/$(PROJECT)
-
 ## SOURCES
 CXX_SRC := $(shell find $(SRC_DIR) -name "*.cpp")
 HXX_SRC := $(shell find $(SRC_DIR) -name "*.h")
@@ -24,6 +15,25 @@ CXX_OBJS := $(addprefix $(BUILD_DIR)/, $(patsubst src/%,%,$(patsubst %.cpp,%.o,$
 
 OBJS := $(CXX_OBJS)
 OBJS_DIRS := $(dir $(OBJS))
+
+###############################################################################
+## DIST
+
+## LIBRARIES OUTPUT
+LIB_DIST_DIR := $(DIST_DIR)/lib
+LIB_SHARED := $(LIB_DIST_DIR)/lib$(PROJECT).so
+LIB_STATIC := $(LIB_DIST_DIR)/lib$(PROJECT).a
+
+## EXECUTABLES OUTPUT
+BIN_DIST_DIR := $(DIST_DIR)/bin
+EXECUTABLES := $(BIN_DIST_DIR)/$(PROJECT)
+
+## HEADERS OUTPUT
+HEADERS_DIST_DIR := $(DIST_DIR)/include
+HEADERS_DIST := $(addprefix $(HEADERS_DIST_DIR)/, $(patsubst src/%,%,$(HXX_SRC)))
+
+###############################################################################
+## COMPILER
 
 ## INCLUDES
 INCLUDE_DIRS += ./src
@@ -43,9 +53,6 @@ LIBRARIES += GLEW
 LIBRARIES += glfw
 LIBRARIES += GL
 LIBRARIES += rt
-
-###############################################################################
-## COMPILER FLAGS
 
 ## COMPILER WARNINGS
 WARNINGS := -Wall -Wno-sign-compare
@@ -68,15 +75,16 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 ###############################################################################
 ## TARGETS
 
-.PHONY: all test clean
+.PHONY: all test clean distclean includes libraries executables
 
 test:
+	@echo $(HEADERS_DIST)
 	@echo $(CXX_DEPS)
 	@echo $(OBJS)
 	@echo $(OBJS_DIRS)
 	@echo $(LIB_SHARED) $(LIB_STATIC)
 
-all: $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLE)
+all: libraries executables includes
 
 $(OBJS): | $(OBJS_DIRS)
 
@@ -86,7 +94,7 @@ $(BIN_DIST_DIR) $(LIB_DIST_DIR) $(OBJS_DIRS):
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@  -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" $<
 
-$(EXECUTABLE): $(OBJS) $(BIN_DIST_DIR)
+$(EXECUTABLES): $(OBJS) $(BIN_DIST_DIR)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 
 $(LIB_SHARED): $(OBJS) $(LIB_DIST_DIR)
@@ -95,8 +103,18 @@ $(LIB_SHARED): $(OBJS) $(LIB_DIST_DIR)
 $(LIB_STATIC): $(OBJS) $(LIB_DIST_DIR)
 	ar rcs $@ $(OBJS)
 
+$(HEADERS_DIST_DIR)/%.h: $(SRC_DIR)/%.h
+	mkdir -p $(dir $@)
+	cp $< $@
+
+executables: $(EXECUTABLES)
+
+libraries: $(LIB_STATIC) $(LIB_SHARED)
+
+includes: $(HEADERS_DIST)
+
 clean:
-	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLE)
+	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLES)
 
 distclean: clean
 	rm -rf $(DIST_DIR) $(BUILD_DIR)
