@@ -39,6 +39,9 @@ HEADERS_DIST := $(addprefix $(HEADERS_DIST_DIR)/, $(patsubst $(LIB_SRC_DIR)/%,%,
 ###############################################################################
 ## COMPILER
 
+## DEFINES
+DEFINES = GLM_FORCE_RADIANS
+
 ## INCLUDES
 INCLUDE_DIRS += $(LIB_SRC_DIR)
 
@@ -69,6 +72,7 @@ else
 endif
 
 COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
+COMMON_FLAGS += $(foreach define,$(DEFINES),-D$(define))
 EXTRA_FLAGS += -pthread -fPIC -std=c++11
 
 CXXFLAGS = $(EXTRA_FLAGS) $(COMMON_FLAGS) $(WARNINGS)

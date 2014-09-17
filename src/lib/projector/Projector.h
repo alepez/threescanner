@@ -26,6 +26,7 @@ private:
 	void setupWindow(const Config& cfg);
 	void render();
 	GLFWwindow* window_;
+	Quad* quad_;
 	GLuint mvpID_;
 	GLuint programID_;
 	bool closeWindow_;

@@ -7,6 +7,7 @@
 #include "Projector.h"
 #include "../common/Config.h"
 #include "threephase/ThreephaseProjector.h"
+#include "Quad.h"
 
 #include "Shaders.h"
 
@@ -28,6 +29,7 @@ static GLFWmonitor* selectMonitor(const std::string& name);
 
 Projector::Projector(const Config& cfg) :
 				window_(nullptr),
+				quad_(nullptr),
 				mvpID_(0),
 				programID_(0),
 				closeWindow_(false),
@@ -37,12 +39,14 @@ Projector::Projector(const Config& cfg) :
 		throw std::runtime_error("Failed to initialize GLFW");
 	}
 	this->setupWindow(cfg.getChild("window"));
+	quad_ = new Quad();
 	programID_ = Shaders::get("threephase"); // TODO
 }
 
 Projector::~Projector() {
 	Shaders::destroy("main");
 	glfwTerminate();
+	delete quad_;
 }
 
 void Projector::setupWindow(const Config& cfg) {
@@ -83,8 +87,9 @@ void Projector::render() {
 	static const glm::mat4 identity(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(programID_);
-	glUniformMatrix4fv(mvpID_, 1, GL_FALSE, &identity[0][0]);
+	glUniformMatrix4fv(mvpID_, 1, GL_FALSE, &identity[0][0]); // TODO: forse mvp si puo` togliere
 	glUniform2f(glGetUniformLocation(programID_, "resolution"), windowWidth_, windowHeight_);
+	quad_->render();
 // TODO	pattern_->render();
 	glfwSwapBuffers(window_);
 	glfwPollEvents();
