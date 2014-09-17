@@ -26,10 +26,11 @@ LIB_SHARED := $(LIB_DIST_DIR)/lib$(PROJECT).so
 LIB_STATIC := $(LIB_DIST_DIR)/lib$(PROJECT).a
 
 ## EXECUTABLES OUTPUT
-EXECUTABLES := projector engine
+APPS := projector engine
 BIN_DIST_DIR := $(DIST_DIR)/bin
-EXECUTABLES_DIST := $(addprefix $(BIN_DIST_DIR)/$(PROJECT)-, $(EXECUTABLES))
-EXECUTABLES_OBJS := $(addsuffix .o,$(addprefix $(BUILD_DIR)/, $(EXECUTABLES)))
+EXECUTABLES_DIST := $(addprefix $(BIN_DIST_DIR)/$(PROJECT)-, $(APPS))
+EXECUTABLES_OBJS := $(addsuffix .o,$(addprefix $(BUILD_DIR)/, $(APPS)))
+EXECUTABLES := $(addprefix $(BUILD_DIR)/, $(APPS))
 
 ## HEADERS OUTPUT
 HEADERS_DIST_DIR := $(DIST_DIR)/include
@@ -90,8 +91,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 ## build executable
 $(EXECUTABLES): $(OBJS)
 	mkdir -p $(BIN_DIST_DIR)
-	$(CXX) $(CXXFLAGS) -c -o $(BUILD_DIR)/$@.o $(SRC_DIR)/$@.cpp
-	$(CXX) -o $(BIN_DIST_DIR)/$(PROJECT)-$@ $(LDFLAGS) $(BUILD_DIR)/$@.o $(OBJS)
+	$(CXX) $(CXXFLAGS) -c -o $@.o $(SRC_DIR)/$(notdir $@).cpp
+	$(CXX) -o $@ $(LDFLAGS) $@.o $(OBJS)
 
 ## build shared library
 $(LIB_SHARED): $(OBJS)
@@ -110,14 +111,9 @@ $(HEADERS_DIST_DIR)/%.h: $(LIB_SRC_DIR)/%.h
 
 test:
 	@echo $(EXECUTABLES)
-	@echo $(HEADERS_DIST_DIR)
-	@echo $(HEADERS_DIST)
-	@echo $(CXX_DEPS)
-	@echo $(CXX_OBJS)
-	@echo $(CXX_SRC)
-	@echo $(OBJS)
-	@echo $(OBJS_DIRS)
-	@echo $(LIB_SHARED) $(LIB_STATIC)
+	@echo $(EXECUTABLES_DIST)
+	@echo $(EXECUTABLES_OBJS)
+
 
 executables: $(EXECUTABLES)
 
