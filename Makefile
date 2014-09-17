@@ -98,4 +98,7 @@ $(LIB_STATIC): $(OBJS) $(LIB_DIST_DIR)
 clean:
 	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLE)
 
+distclean: clean
+	rm -rf $(DIST_DIR) $(BUILD_DIR)
+
 -include $(CXX_DEPS)
