@@ -59,19 +59,19 @@ LIBRARIES += GL
 LIBRARIES += rt
 
 ## COMPILER WARNINGS
-WARNINGS := -Wall -Wno-sign-compare
+WARNINGS := -pedantic -Wall -Wextra -c -fmessage-length=0
 
 ## COMPILER FLAGS (DEBUG/RELEASE)
 ifeq ($(DEBUG), 1)
-	COMMON_FLAGS += -DDEBUG -g -O0
+	COMMON_FLAGS += -DDEBUG -g3 -O0
 else
 	COMMON_FLAGS += -DNDEBUG -O2
 endif
 
-## 
 COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
+EXTRA_FLAGS += -pthread -fPIC
 
-CXXFLAGS = -pthread -fPIC $(COMMON_FLAGS) $(WARNINGS)
+CXXFLAGS = $(EXTRA_FLAGS) $(COMMON_FLAGS) $(WARNINGS)
 
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
 LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
@@ -89,9 +89,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@  -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" $<
 
 ## build executable
-$(EXECUTABLES): $(OBJS)
+$(EXECUTABLES): $(OBJS) $(EXECUTABLES_OBJS)
 	mkdir -p $(BIN_DIST_DIR)
-	$(CXX) $(CXXFLAGS) -c -o $@.o $(SRC_DIR)/$(notdir $@).cpp
 	$(CXX) -o $@ $(LDFLAGS) $@.o $(OBJS)
 
 ## build shared library
