@@ -131,6 +131,14 @@ all: libraries executables
 ## build libraries executables and miscellaneus
 dist: all includes
 
+## install
+install:
+	@echo install not implemented
+
+## doc
+doc:
+	@echo install not implemented
+
 ## clean libraries and executables
 clean:
 	rm -f $(OBJS) $(CXX_DEPS)  $(EXECUTABLES_OBJS)
