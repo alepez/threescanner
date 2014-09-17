@@ -71,6 +71,7 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 .PHONY: all test clean
 
 test:
+	@echo $(CXX_DEPS)
 	@echo $(OBJS)
 	@echo $(OBJS_DIRS)
 	@echo $(LIB_SHARED) $(LIB_STATIC)
@@ -83,7 +84,7 @@ $(BIN_DIST_DIR) $(LIB_DIST_DIR) $(OBJS_DIRS):
 	mkdir -p $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@  -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" $<
 
 $(EXECUTABLE): $(OBJS) $(BIN_DIST_DIR)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
@@ -96,3 +97,5 @@ $(LIB_STATIC): $(OBJS) $(LIB_DIST_DIR)
 
 clean:
 	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLE)
+
+-include $(CXX_DEPS)
