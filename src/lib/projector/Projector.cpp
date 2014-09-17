@@ -27,10 +27,10 @@ namespace threescanner {
 
 static GLFWmonitor* selectMonitor(const std::string& name);
 
-Projector::Projector(const Config& cfg) :
+Projector::Projector(const std::string& type, const Config& cfg) :
+				engineType_(type),
 				window_(nullptr),
 				quad_(nullptr),
-				mvpID_(0),
 				programID_(0),
 				closeWindow_(false),
 				windowWidth_(0),
@@ -40,11 +40,11 @@ Projector::Projector(const Config& cfg) :
 	}
 	this->setupWindow(cfg.getChild("window"));
 	quad_ = new Quad();
-	programID_ = Shaders::get("threephase"); // TODO
+	programID_ = Shaders::get(engineType_);
 }
 
 Projector::~Projector() {
-	Shaders::destroy("main");
+	Shaders::destroy(programID_);
 	glfwTerminate();
 	delete quad_;
 }
@@ -87,10 +87,8 @@ void Projector::render() {
 	static const glm::mat4 identity(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(programID_);
-	glUniformMatrix4fv(mvpID_, 1, GL_FALSE, &identity[0][0]); // TODO: forse mvp si puo` togliere
 	glUniform2f(glGetUniformLocation(programID_, "resolution"), windowWidth_, windowHeight_);
 	quad_->render();
-// TODO	pattern_->render();
 	glfwSwapBuffers(window_);
 	glfwPollEvents();
 }

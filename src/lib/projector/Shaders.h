@@ -11,6 +11,7 @@ class Shaders {
 public:
 	static GLuint get(const std::string& name);
 	static void destroy(const std::string& name);
+	static void destroy(const GLuint& id);
 private:
 	static GLuint load(const std::string& name);
 	static void loadShader(GLuint programID, const std::string& name, const GLenum type);
