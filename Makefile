@@ -28,6 +28,8 @@ LIB_STATIC := $(LIB_DIST_DIR)/lib$(PROJECT).a
 ## EXECUTABLES OUTPUT
 EXECUTABLES := projector engine
 BIN_DIST_DIR := $(DIST_DIR)/bin
+EXECUTABLES_DIST := $(addprefix $(BIN_DIST_DIR)/$(PROJECT)-, $(EXECUTABLES))
+EXECUTABLES_OBJS := $(addsuffix .o,$(addprefix $(BUILD_DIR)/, $(EXECUTABLES)))
 
 ## HEADERS OUTPUT
 HEADERS_DIST_DIR := $(DIST_DIR)/include
@@ -91,24 +93,31 @@ test:
 
 all: libraries executables
 
-$(OBJS): | $(OBJS_DIRS)
-
+## create build directories tree
 $(BIN_DIST_DIR) $(LIB_DIST_DIR) $(OBJS_DIRS):
 	mkdir -p $@
 
+## create build directories tree before objects
+$(OBJS): | $(OBJS_DIRS)
+
+## build single object
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@  -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" $<
 
+## build executable
 $(EXECUTABLES): $(OBJS) $(BIN_DIST_DIR)
 	$(CXX) $(CXXFLAGS) -c -o $(BUILD_DIR)/$@.o $(SRC_DIR)/$@.cpp
 	$(CXX) -o $(BIN_DIST_DIR)/$(PROJECT)-$@ $(LDFLAGS) $(BUILD_DIR)/$@.o
 
+## build shared library
 $(LIB_SHARED): $(OBJS) $(LIB_DIST_DIR)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
 
+## build static library
 $(LIB_STATIC): $(OBJS) $(LIB_DIST_DIR)
 	ar rcs $@ $(OBJS)
 
+## copy headers to dist/include
 $(HEADERS_DIST_DIR)/%.h: $(SRC_DIR)/%.h
 	mkdir -p $(dir $@)
 	cp $< $@
@@ -120,9 +129,8 @@ libraries: $(LIB_STATIC) $(LIB_SHARED)
 includes: $(HEADERS_DIST)
 
 clean:
-	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(CXX_DEPS)
-	rm -f $(addprefix $(BIN_DIST_DIR)/$(PROJECT)-, $(EXECUTABLES))
-	rm -f $(addsuffix .o,$(addprefix $(BUILD_DIR)/, $(EXECUTABLES)))
+	rm -f $(OBJS) $(CXX_DEPS)  $(EXECUTABLES_OBJS)
+	rm -f $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLES_DIST)
 
 distclean: clean
 	rm -rf $(DIST_DIR) $(BUILD_DIR)
