@@ -2,16 +2,17 @@ PROJECT := threephase
 
 ## DIRECTORIES
 SRC_DIR := src
+LIB_SRC_DIR := $(SRC_DIR)/lib
 BUILD_DIR := build
 DIST_DIR := dist
 
 ## SOURCES
-CXX_SRC := $(shell find $(SRC_DIR) -name "*.cpp")
-HXX_SRC := $(shell find $(SRC_DIR) -name "*.h")
+CXX_SRC := $(shell find $(LIB_SRC_DIR) -name "*.cpp")
+HXX_SRC := $(shell find $(LIB_SRC_DIR) -name "*.h")
 
 ## OBJECTS
-CXX_DEPS := $(addprefix $(BUILD_DIR)/, $(patsubst src/%,%,$(patsubst %.cpp,%.d,$(CXX_SRC))))
-CXX_OBJS := $(addprefix $(BUILD_DIR)/, $(patsubst src/%,%,$(patsubst %.cpp,%.o,$(CXX_SRC))))
+CXX_OBJS := $(addprefix $(BUILD_DIR)/, $(patsubst $(SRC_DIR)/%,%,$(patsubst %.cpp,%.o,$(CXX_SRC))))
+CXX_DEPS := $(CXX_OBJS:.o=.d)
 
 OBJS := $(CXX_OBJS)
 OBJS_DIRS := $(dir $(OBJS))
@@ -25,18 +26,18 @@ LIB_SHARED := $(LIB_DIST_DIR)/lib$(PROJECT).so
 LIB_STATIC := $(LIB_DIST_DIR)/lib$(PROJECT).a
 
 ## EXECUTABLES OUTPUT
+EXECUTABLES := projector engine
 BIN_DIST_DIR := $(DIST_DIR)/bin
-EXECUTABLES := $(BIN_DIST_DIR)/$(PROJECT)
 
 ## HEADERS OUTPUT
 HEADERS_DIST_DIR := $(DIST_DIR)/include
-HEADERS_DIST := $(addprefix $(HEADERS_DIST_DIR)/, $(patsubst src/%,%,$(HXX_SRC)))
+HEADERS_DIST := $(addprefix $(HEADERS_DIST_DIR)/, $(patsubst $(LIB_SRC_DIR)/%,%,$(HXX_SRC)))
 
 ###############################################################################
 ## COMPILER
 
 ## INCLUDES
-INCLUDE_DIRS += ./src
+INCLUDE_DIRS += $(SRC_DIR)
 
 ## LIBRARIES
 LIBRARIES += pcl_common
@@ -78,8 +79,11 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 .PHONY: all test clean distclean includes libraries executables
 
 test:
+	@echo $(EXECUTABLES)
 	@echo $(HEADERS_DIST)
 	@echo $(CXX_DEPS)
+	@echo $(CXX_OBJS)
+	@echo $(CXX_SRC)
 	@echo $(OBJS)
 	@echo $(OBJS_DIRS)
 	@echo $(LIB_SHARED) $(LIB_STATIC)
@@ -95,7 +99,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@  -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" $<
 
 $(EXECUTABLES): $(OBJS) $(BIN_DIST_DIR)
-	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -c -o $(BUILD_DIR)/$@.o $(SRC_DIR)/$@.cpp
+	$(CXX) -o $(BIN_DIST_DIR)/$@ $(LDFLAGS)
 
 $(LIB_SHARED): $(OBJS) $(LIB_DIST_DIR)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
