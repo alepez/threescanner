@@ -1,18 +1,18 @@
 /*
- * Projector.cpp
+ * Engine.cpp
  *
  * Copyright (c) 2014, Alessandro Pezzato
  */
 
-#include "Projector.h"
+#include "Engine.h"
 
 namespace threescanner {
 
-Projector::Projector() {
+Engine::Engine() {
 
 }
 
-Projector::~Projector() {
+Engine::~Engine() {
 
 }
 

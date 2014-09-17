@@ -39,7 +39,7 @@ HEADERS_DIST := $(addprefix $(HEADERS_DIST_DIR)/, $(patsubst $(LIB_SRC_DIR)/%,%,
 ## COMPILER
 
 ## INCLUDES
-INCLUDE_DIRS += $(SRC_DIR)
+INCLUDE_DIRS += $(LIB_SRC_DIR)
 
 ## LIBRARIES
 LIBRARIES += pcl_common
@@ -91,7 +91,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(EXECUTABLES): $(OBJS)
 	mkdir -p $(BIN_DIST_DIR)
 	$(CXX) $(CXXFLAGS) -c -o $(BUILD_DIR)/$@.o $(SRC_DIR)/$@.cpp
-	$(CXX) -o $(BIN_DIST_DIR)/$(PROJECT)-$@ $(LDFLAGS) $(BUILD_DIR)/$@.o
+	$(CXX) -o $(BIN_DIST_DIR)/$(PROJECT)-$@ $(LDFLAGS) $(BUILD_DIR)/$@.o $(OBJS)
 
 ## build shared library
 $(LIB_SHARED): $(OBJS)

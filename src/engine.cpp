@@ -1,6 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <engine/Engine.h>
 
-int main(void) {
+using namespace threescanner;
+
+int main(int argc, char* argv[]) {
+	Engine engine;
 	return 0;
 }

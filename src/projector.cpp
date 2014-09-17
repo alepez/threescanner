@@ -1,6 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <projector/Projector.h>
 
-int main(void) {
+using namespace threescanner;
+
+int main(int argc, char* argv[]) {
+	Projector projector;
 	return 0;
 }
