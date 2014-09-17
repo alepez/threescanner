@@ -103,7 +103,13 @@ GLuint Shaders::get(const std::string& name) {
 }
 
 void Shaders::destroy(const std::string& name) {
+	// TODO remove from shaders_c
 	glDeleteProgram(Shaders::get(name));
+}
+
+void Shaders::destroy(const GLuint& id) {
+	// TODO remove from shaders_c
+	glDeleteProgram(id);
 }
 
 }

@@ -8,7 +8,8 @@
 
 namespace threescanner {
 
-ThreephaseProjector::ThreephaseProjector(const Config& cfg) : Projector(cfg) {
+ThreephaseProjector::ThreephaseProjector(const Config& cfg) :
+				Projector("threephase", cfg) {
 
 }
 

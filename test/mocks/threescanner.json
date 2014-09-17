@@ -1,4 +1,11 @@
 {
   "engine": {},
-  "projector": {}
+  "projector": {
+    "window": {
+      "name": "threescanner",
+      "width": "1024",
+      "height": "768",
+      "monitor": "none"
+    }
+  }
 }
