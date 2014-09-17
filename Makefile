@@ -80,6 +80,7 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 
 test:
 	@echo $(EXECUTABLES)
+	@echo $(HEADERS_DIST_DIR)
 	@echo $(HEADERS_DIST)
 	@echo $(CXX_DEPS)
 	@echo $(CXX_OBJS)
@@ -88,7 +89,7 @@ test:
 	@echo $(OBJS_DIRS)
 	@echo $(LIB_SHARED) $(LIB_STATIC)
 
-all: libraries executables includes
+all: libraries executables
 
 $(OBJS): | $(OBJS_DIRS)
 
@@ -100,7 +101,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 $(EXECUTABLES): $(OBJS) $(BIN_DIST_DIR)
 	$(CXX) $(CXXFLAGS) -c -o $(BUILD_DIR)/$@.o $(SRC_DIR)/$@.cpp
-	$(CXX) -o $(BIN_DIST_DIR)/$@ $(LDFLAGS)
+	$(CXX) -o $(BIN_DIST_DIR)/$(PROJECT)-$@ $(LDFLAGS) $(BUILD_DIR)/$@.o
 
 $(LIB_SHARED): $(OBJS) $(LIB_DIST_DIR)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
@@ -119,7 +120,9 @@ libraries: $(LIB_STATIC) $(LIB_SHARED)
 includes: $(HEADERS_DIST)
 
 clean:
-	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLES)
+	rm -f $(OBJS) $(LIB_SHARED) $(LIB_STATIC) $(CXX_DEPS)
+	rm -f $(addprefix $(BIN_DIST_DIR)/$(PROJECT)-, $(EXECUTABLES))
+	rm -f $(addsuffix .o,$(addprefix $(BUILD_DIR)/, $(EXECUTABLES)))
 
 distclean: clean
 	rm -rf $(DIST_DIR) $(BUILD_DIR)
