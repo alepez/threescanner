@@ -10,16 +10,13 @@
 
 namespace threescanner {
 
-Engine::Engine(const Config&) {
+Engine::Engine(const Config& cfg, ImageInput* input) :
+				input_(input) {
 
 }
 
 Engine::~Engine() {
 
-}
-
-void Engine::setParameter(const std::string& key, const std::string& value) {
-	/* must be reimplemented by derived class */
 }
 
 } /* namespace threescanner */

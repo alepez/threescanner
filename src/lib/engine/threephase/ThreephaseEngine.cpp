@@ -17,6 +17,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
 
 /*
  * http://public.vrac.iastate.edu/~song/publications/papers/2010-ole-review.pdf
@@ -69,8 +70,8 @@ void traceMatrix(const std::string& name, const glm::mat4& mat) {
 
 } /* namespace anonymous */
 
-ThreephaseEngine::ThreephaseEngine(const Config& cfg) :
-				Engine(cfg),
+ThreephaseEngine::ThreephaseEngine(const Config& cfg, ImageInput* input) :
+				Engine(cfg, input),
 				wrapMethod_(cfg.get<int>("wrapMethod")),
 				options_(),
 				toProcess_(),
@@ -97,6 +98,20 @@ ThreephaseEngine::ThreephaseEngine(const Config& cfg) :
 
 ThreephaseEngine::~ThreephaseEngine() {
 
+}
+
+void ThreephaseEngine::startScan() {
+	/* TODO: should get images from ImageInput (Camera)
+	 * not from filesystem
+	 */
+	static const std::string filePathPattern = "phase%u.png";
+	for (size_t phase = 0; phase < 3; ++phase) {
+		auto filepath = fmt::sprintf(filePathPattern, phase + 1);
+		hImages_[phase] = cv::imread(filepath, CV_LOAD_IMAGE_GRAYSCALE);
+		if (hImages_[phase].rows) {
+			logInfo("Loaded test image for phase %i from %s %i", phase + 1, filepath.c_str(), hImages_[phase].flags);
+		}
+	}
 }
 
 void ThreephaseEngine::setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image) {
@@ -317,7 +332,11 @@ void ThreephaseEngine::setParameter(const std::string& key, const std::string& v
 }
 
 void ThreephaseEngine::setImage(const std::string& id, const cv::Mat& image) {
-
+	std::vector < std::string > params;
+	boost::split(params, id, boost::is_any_of(":"));
+	auto orientation = params[0];
+	auto phase = boost::lexical_cast < size_t > (params[1]);
+	this->setImage(orientation, phase, image);
 }
 
 } /* namespace threescanner */

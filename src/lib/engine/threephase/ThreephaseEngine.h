@@ -24,9 +24,10 @@ struct RawPointCloud {
 
 class ThreephaseEngine: public Engine {
 public:
-	ThreephaseEngine(const Config& cfg);
+	ThreephaseEngine(const Config& cfg, ImageInput* input);
 	virtual ~ThreephaseEngine();
 private:
+	virtual void startScan();
 	virtual void setParameter(const std::string& key, const std::string& value);
 	virtual void setImage(const std::string& id, const cv::Mat& image);
 	void setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image);

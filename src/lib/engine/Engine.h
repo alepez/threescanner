@@ -18,10 +18,12 @@ class Engine {
 public:
 	void run();
 	virtual ~Engine();
-	virtual void setParameter(const std::string& key, const std::string& value);
+	virtual void startScan() = 0;
+	virtual void setParameter(const std::string& key, const std::string& value) = 0;
 	virtual void setImage(const std::string& id, const cv::Mat& image) = 0;
 protected:
-	Engine(const Config&);
+	Engine(const Config&, ImageInput* input);
+	ImageInput* input_;
 };
 
 } /* namespace threescanner */

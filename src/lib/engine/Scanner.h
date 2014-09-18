@@ -20,6 +20,7 @@ public:
 private:
 	void handleAction(const std::string& action, const std::vector<std::string>& params);
 	Engine* engine_;
+	bool quit_;
 };
 
 } /* namespace threescanner */

@@ -25,9 +25,10 @@ int main(int argc, char* argv[]) {
 	std::string confFilepath = argc > 2 ? argv[2] : "threescanner.json";
 	std::string confChildname = argc > 3 ? argv[3] : "scanner";
 	Config cfg = Config(confFilepath).getChild(confChildname);
+	ImageInput* input = nullptr;
 	Engine* engine = nullptr;
 	if (type == "threephase") {
-		engine = new ThreephaseEngine(cfg.getChild("engine"));
+		engine = new ThreephaseEngine(cfg.getChild("engine"), input);
 	}
 	Scanner scanner(cfg, engine);
 	scanner.run(continueRunning);

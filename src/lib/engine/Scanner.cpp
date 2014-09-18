@@ -9,13 +9,12 @@
 #include "../common/Logger.h"
 #include "Engine.h"
 
-#include <boost/algorithm/string.hpp>
-
 namespace threescanner {
 
 Scanner::Scanner(const Config& cfg, Engine* engine) :
 				TcpServer(cfg.getChild("net")),
-				engine_(engine) {
+				engine_(engine),
+				quit_(false) {
 }
 
 Scanner::~Scanner() {
@@ -23,7 +22,7 @@ Scanner::~Scanner() {
 }
 
 void Scanner::run(const bool& continueRunning) {
-	while (continueRunning) {
+	while (continueRunning && !quit_) {
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 		this->syncComm();
 	}
@@ -33,7 +32,14 @@ void Scanner::handleAction(const std::string& action, const std::vector<std::str
 	if (action.empty()) {
 		return;
 	}
-	logTrace(action + " => " + boost::join(params, " "));
+	if (action == "quit") {
+		quit_ = true;
+		return;
+	}
+	if (action == "scan") {
+		engine_->startScan();
+		return;
+	}
 	if ((action == "set") && params.size() == 2) {
 		engine_->setParameter(params[0], params[1]);
 		return;
