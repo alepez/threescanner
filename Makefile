@@ -5,6 +5,9 @@ SRC_DIR := src
 LIB_SRC_DIR := $(SRC_DIR)/lib
 BUILD_DIR := build
 DIST_DIR := dist
+THIRD_PARTY_LIB_DIR := third_party/lib
+THIRD_PARTY_INCLUDE_DIR := third_party/include
+THIRD_PARTY_TMP_DIR := third_party/tmp
 
 ## SOURCES
 CXX_SRC := $(shell find $(LIB_SRC_DIR) -name "*.cpp")
@@ -43,7 +46,7 @@ HEADERS_DIST := $(addprefix $(HEADERS_DIST_DIR)/, $(patsubst $(LIB_SRC_DIR)/%,%,
 DEFINES = GLM_FORCE_RADIANS
 
 ## INCLUDES
-INCLUDE_DIRS += $(LIB_SRC_DIR)
+INCLUDE_DIRS += $(LIB_SRC_DIR) $(THIRD_PARTY_INCLUDE_DIR)
 
 ## LIBRARIES
 LIBRARIES += pcl_common
@@ -60,6 +63,8 @@ LIBRARIES += GLEW
 LIBRARIES += glfw
 LIBRARIES += GL
 LIBRARIES += rt
+
+LIBRARY_DIRS := $(THIRD_PARTY_LIB_DIR)
 
 ## COMPILER WARNINGS
 WARNINGS := -pedantic -Wall -Wextra -c -fmessage-length=0
@@ -127,6 +132,10 @@ all: libraries executables
 ## build libraries executables and miscellaneus
 dist: all includes
 
+## get and build third party
+thirdparty:
+	for script in $(wildcard third_party/*.sh); do echo $$script; $$script; done
+
 ## install
 install:
 	@echo install not implemented
@@ -143,5 +152,6 @@ clean:
 ## clean everything
 distclean: clean
 	rm -rf $(DIST_DIR) $(BUILD_DIR)
+	rm -rf $(THIRD_PARTY_INCLUDE_DIR) $(THIRD_PARTY_LIB_DIR) $(THIRD_PARTY_TMP_DIR)
 
 -include $(CXX_DEPS)

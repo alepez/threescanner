@@ -6,6 +6,7 @@
 
 #include "Projector.h"
 #include "../common/Config.h"
+#include "../common/Logger.h"
 #include "threephase/ThreephaseProjector.h"
 #include "Quad.h"
 
@@ -74,6 +75,7 @@ void Projector::setupWindow(const Config& cfg) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	logDebug("Window size: %ix%i", windowWidth_, windowHeight_);
 }
 
 void Projector::run() {
