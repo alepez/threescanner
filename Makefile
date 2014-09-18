@@ -29,7 +29,7 @@ LIB_SHARED := $(LIB_DIST_DIR)/lib$(PROJECT).so
 LIB_STATIC := $(LIB_DIST_DIR)/lib$(PROJECT).a
 
 ## EXECUTABLES OUTPUT
-APPS := projector engine
+APPS := projector scanner
 BIN_DIST_DIR := $(DIST_DIR)/bin
 EXECUTABLES_DIST := $(addprefix $(BIN_DIST_DIR)/$(PROJECT)-, $(APPS))
 EXECUTABLES_OBJS := $(addsuffix .o,$(addprefix $(BUILD_DIR)/, $(APPS)))
