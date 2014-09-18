@@ -9,12 +9,15 @@
 
 #include "../prerequisites.h"
 
+#include <string>
+
 namespace threescanner {
 
 class Engine {
 protected:
 	Engine(const Config&);
 	virtual ~Engine();
+	virtual void setParameter(const std::string& key, const std::string& value);
 };
 
 } /* namespace threescanner */

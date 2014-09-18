@@ -18,4 +18,8 @@ Engine::~Engine() {
 
 }
 
+void Engine::setParameter(const std::string& key, const std::string& value) {
+	/* must be reimplemented by derived class */
+}
+
 } /* namespace threescanner */
