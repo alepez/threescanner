@@ -1,5 +1,17 @@
 {
-  "engine": {},
+  "scanner": {
+    "engine": {
+      "wrapMethod": 1,
+      "tuning": {
+        "mscale": 200,
+        "zscale": 0,
+        "zskew": 178.7,
+        "znoise": 0.72,
+        "zblur": 16,
+        "step": 4
+      }
+    }
+  },
   "projector": {
     "window": {
       "name": "threescanner",

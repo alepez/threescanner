@@ -15,9 +15,11 @@
 namespace threescanner {
 
 class Engine {
+public:
+	void run();
+	virtual ~Engine();
 protected:
 	Engine(const Config&);
-	virtual ~Engine();
 	virtual void setParameter(const std::string& key, const std::string& value);
 	virtual void setImage(const std::string& id, const cv::Mat& image) = 0;
 };
