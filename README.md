@@ -48,6 +48,9 @@ Build debug version:
 
     make DEBUG=1 all
 
+Test scripts are `test/mocks/` and automatic tests start with `auto_`.  
+Automatic tests can be called with `make test`. 
+
 ## What is structured light?
 
 Structured light is a method of 3D scanning where we project a known pattern onto an unknown surface and by analyzing the deformation (warping) of the known pattern we can mathematically reconstruct the surface virtually. 
