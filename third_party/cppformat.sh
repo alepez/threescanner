@@ -13,7 +13,4 @@ wget https://github.com/cppformat/cppformat/archive/master.zip -O cppformat.zip
 unzip cppformat.zip
 rm -f cppformat.zip
 cd cppformat-master
-cmake .
-make
-cp libformat.a libgmock.a ../../lib
-cp format.h ../../include
+cp format.h format.cc ../../include

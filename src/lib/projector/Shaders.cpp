@@ -6,8 +6,7 @@
  */
 
 #include "Shaders.h"
-//#include <utils/Format.h>
-//#include <utils/log.h>
+#include "../common/Logger.h"
 #include <fstream>
 #include <vector>
 #include <algorithm>
@@ -31,7 +30,7 @@ GLuint Shaders::load(const std::string& name) {
 	char* errorMessage = new char[infoLen];
 	glGetProgramInfoLog(programID, infoLen, NULL, errorMessage);
 	if (errorMessage[0]) {
-// TODO		LOG_DEBUG(Format("%s", errorMessage));
+		logWarning(errorMessage);
 	}
 	delete errorMessage;
 
@@ -73,7 +72,7 @@ void Shaders::loadShader(GLuint programID, const std::string& name, const GLenum
 	}
 
 	// Compile Vertex Shader
-// TODO	LOG_DEBUG("Compiling shader: " + filePath);
+	logDebug("Compiling shader: " + filePath);
 	const char* source = shaderCode.c_str();
 	glShaderSource(shaderID, 1, &source, NULL);
 	glCompileShader(shaderID);
@@ -86,7 +85,7 @@ void Shaders::loadShader(GLuint programID, const std::string& name, const GLenum
 	char* errorMessage = new char[infoLen];
 	glGetShaderInfoLog(shaderID, infoLen, NULL, errorMessage);
 	if (errorMessage[0]) {
-// TODO		LOG_DEBUG(errorMessage);
+		logWarning(errorMessage);
 	}
 	delete errorMessage;
 
