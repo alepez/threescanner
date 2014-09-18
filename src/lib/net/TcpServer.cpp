@@ -4,8 +4,7 @@
  * Copyright (c) 2014, Alessandro Pezzato
  */
 
-#include <comm/TcpServer.h>
-
+#include "TcpServer.h"
 #include "../common/Logger.h"
 #include "../common/Config.h"
 
