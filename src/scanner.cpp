@@ -29,10 +29,8 @@ int main(int argc, char* argv[]) {
 	if (type == "threephase") {
 		engine = new ThreephaseEngine(cfg.getChild("engine"));
 	}
-	Scanner scanner;
-	while (continueRunning) {
-		scanner.run();
-	}
+	Scanner scanner(cfg, engine);
+	scanner.run(continueRunning);
 	delete engine;
 	return 0;
 }

@@ -14,6 +14,6 @@ function try_gdb() {
   return 255
 }
 
-try_gdb ${BIN_DIR}/engine
+try_gdb ${BIN_DIR}/scanner
 
 echo "Cannot find executable";

@@ -21,6 +21,8 @@ static const int LOG_LEVEL_FATAL = 0;
 
 void log(const int level, const std::string& message);
 
+#define __FILE_LINE__ fmt::sprintf("%s:%i", __FILE__, __LINE__)
+
 #if defined(TRACE) && defined(DEBUG) && !defined(NDEBUG)
 inline void logTrace(const std::string& message) {
 	log(LOG_LEVEL_TRACE, message);

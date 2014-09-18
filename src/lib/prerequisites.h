@@ -10,6 +10,7 @@
 namespace threescanner {
 
 class Config;
+class Engine;
 class Quad;
 
 }

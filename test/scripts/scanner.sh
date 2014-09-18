@@ -8,4 +8,4 @@ export PATH="${PATH}:${BIN_DIR}"
 
 cd "${CURR_DIR}"
 
-${BIN_DIR}/engine
+${BIN_DIR}/scanner

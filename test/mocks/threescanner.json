@@ -10,6 +10,10 @@
         "zblur": 16,
         "step": 4
       }
+    },
+    "net": {
+      "name": "Scanner",
+      "port": 11601
     }
   },
   "projector": {
@@ -20,7 +24,7 @@
       "monitor": "none"
     },
     "net": {
-      "name": "Graphics",
+      "name": "Projector",
       "port": 11602
     }
   }
