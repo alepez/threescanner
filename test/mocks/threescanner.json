@@ -1,5 +1,21 @@
 {
-  "engine": {},
+  "scanner": {
+    "engine": {
+      "wrapMethod": 1,
+      "tuning": {
+        "mscale": 200,
+        "zscale": 0,
+        "zskew": 178.7,
+        "znoise": 0.72,
+        "zblur": 16,
+        "step": 4
+      }
+    },
+    "net": {
+      "name": "Scanner",
+      "port": 11601
+    }
+  },
   "projector": {
     "window": {
       "name": "threescanner",
@@ -8,7 +24,7 @@
       "monitor": "none"
     },
     "net": {
-      "name": "Graphics",
+      "name": "Projector",
       "port": 11602
     }
   }
