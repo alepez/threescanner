@@ -6,28 +6,20 @@
 
 #include "Projector.h"
 #include "../common/Config.h"
+#include "../common/Logger.h"
 #include "threephase/ThreephaseProjector.h"
 #include "Quad.h"
-
 #include "Shaders.h"
 
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-
-using namespace glm;
-using boost::lexical_cast;
-using namespace boost;
 
 namespace threescanner {
 
 static GLFWmonitor* selectMonitor(const std::string& name);
 
 Projector::Projector(const std::string& type, const Config& cfg) :
+				TcpServer(cfg.getChild("net")),
 				engineType_(type),
 				window_(nullptr),
 				quad_(nullptr),
@@ -74,11 +66,13 @@ void Projector::setupWindow(const Config& cfg) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	logDebug("Window size: %ix%i", windowWidth_, windowHeight_);
 }
 
 void Projector::run() {
 	glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_TRUE);
 	do {
+		this->syncComm();
 		this->render();
 	} while ((glfwGetKey(window_, GLFW_KEY_ESCAPE) != GLFW_PRESS) && (!glfwWindowShouldClose(window_)) && !closeWindow_);
 }
@@ -93,10 +87,27 @@ void Projector::render() {
 	glfwPollEvents();
 }
 
-GLFWmonitor* selectMonitor(const std::string& name) {
-	if (name == "none") {
-		return nullptr;
+void Projector::handleAction(const std::string& action, const std::vector<std::string>& params) {
+	if (action.empty()) {
+		return;
 	}
+	logTrace(action + " => " + boost::join(params, " "));
+	if (action == "quit") {
+		closeWindow_ = true;
+		return;
+	}
+	if ((action == "set") && params.size() == 2) {
+		this->setParameters(params[0], params[1]);
+		return;
+	}
+	logWarning("Projector: unknown action: " + action);
+}
+
+void Projector::setParameters(const std::string&, const std::string&) {
+	/* must be reimplemented */
+}
+
+GLFWmonitor* selectMonitor(const std::string& name) {
 	int count = 0;
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
 	for (int i = 0; i != count; ++i) {
@@ -105,7 +116,12 @@ GLFWmonitor* selectMonitor(const std::string& name) {
 			return monitor;
 		}
 	}
-	throw std::runtime_error("Cannot find monitor " + name);
+	logError("Cannot find monitor " + name);
+	return nullptr;
+}
+
+GLuint Projector::getProgramID() {
+	return programID_;
 }
 
 } /* namespace threescanner */
