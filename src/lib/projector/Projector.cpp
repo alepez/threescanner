@@ -12,12 +12,14 @@
 #include "Shaders.h"
 
 #include <GLFW/glfw3.h>
+#include <boost/algorithm/string.hpp>
 
 namespace threescanner {
 
 static GLFWmonitor* selectMonitor(const std::string& name);
 
 Projector::Projector(const std::string& type, const Config& cfg) :
+				TcpServer(cfg.getChild("net")),
 				engineType_(type),
 				window_(nullptr),
 				quad_(nullptr),
@@ -70,6 +72,7 @@ void Projector::setupWindow(const Config& cfg) {
 void Projector::run() {
 	glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_TRUE);
 	do {
+		this->syncComm();
 		this->render();
 	} while ((glfwGetKey(window_, GLFW_KEY_ESCAPE) != GLFW_PRESS) && (!glfwWindowShouldClose(window_)) && !closeWindow_);
 }
@@ -84,6 +87,26 @@ void Projector::render() {
 	glfwPollEvents();
 }
 
+void Projector::handleAction(const std::string& action, const std::vector<std::string>& params) {
+	if (action.empty()) {
+		return;
+	}
+	logTrace(action + " => " + boost::join(params, " "));
+	if (action == "quit") {
+		closeWindow_ = true;
+		return;
+	}
+	if ((action == "set") && params.size() == 2) {
+		this->setParameters(params[0], params[1]);
+		return;
+	}
+	logWarning("Projector: unknown action: " + action);
+}
+
+void Projector::setParameters(const std::string&, const std::string&) {
+	/* must be reimplemented */
+}
+
 GLFWmonitor* selectMonitor(const std::string& name) {
 	int count = 0;
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
@@ -95,6 +118,10 @@ GLFWmonitor* selectMonitor(const std::string& name) {
 	}
 	logError("Cannot find monitor " + name);
 	return nullptr;
+}
+
+GLuint Projector::getProgramID() {
+	return programID_;
 }
 
 } /* namespace threescanner */

@@ -6,6 +6,10 @@
       "width": "1024",
       "height": "768",
       "monitor": "none"
+    },
+    "net": {
+      "name": "Graphics",
+      "port": 11602
     }
   }
 }
