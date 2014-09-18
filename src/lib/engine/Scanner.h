@@ -19,6 +19,7 @@ public:
 	void run(const bool& continueRunning);
 private:
 	void handleAction(const std::string& action, const std::vector<std::string>& params);
+	void saveCloud(const std::string& filepath);
 	Engine* engine_;
 	bool quit_;
 };

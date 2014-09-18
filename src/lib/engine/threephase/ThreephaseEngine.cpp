@@ -81,8 +81,7 @@ ThreephaseEngine::ThreephaseEngine(const Config& cfg, ImageInput* input) :
 				process_(),
 				unwrapped_(),
 				mask_(),
-				depth_(),
-				rawCloud_(nullptr) {
+				depth_() {
 
 	/* tuning */
 	Config tuning = cfg.getChild("tuning");
@@ -112,6 +111,9 @@ void ThreephaseEngine::startScan() {
 			logInfo("Loaded test image for phase %i from %s %i", phase + 1, filepath.c_str(), hImages_[phase].flags);
 		}
 	}
+	/* --- */
+	std::string orientation = "h"; /* TODO: from Config */
+	this->process(orientation);
 }
 
 void ThreephaseEngine::setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image) {
@@ -297,27 +299,32 @@ void ThreephaseEngine::saveToCloud() {
 		float x, y, z;
 	};
 
-	RawPoint* rowCloudData = reinterpret_cast<RawPoint*>(rawCloud_->data_);
-	RawPoint* rcd = rowCloudData;
-
-	float pointsNum = 0.0;
+	PointCloud& cloud = *cloud_;
+	/*
+	 * TODO: need optimization. cloud_ memory can be reserved in
+	 * initialization, then only size change. But how? std::vector
+	 * do not permit to change size without deallocating.
+	 */
+	cloud.clear();
 
 	for (int y = 0; y < height; ++y) {
 		float planephase = 0.5 + float(y - (height / 2)) / skew;
 		for (int x = 0; x < width; ++x) {
 			if (!mask_.at<uchar>(y, x)) {
 				float z = (unwrapped_.at<float>(y, x) - planephase) * scale;
-				rcd->x = x;
-				rcd->y = y;
-				rcd->z = z;
-				pointsNum += 1.0;
-				++rcd;
+				Point p;
+				p.x = x;
+				p.y = y;
+				p.z = z;
+				p.r = 0xff;
+				p.g = 0xff;
+				p.b = 0xff;
+				cloud.push_back(p);
 			}
 		}
 	}
 
-	rawCloud_->size_ = pointsNum;
-	logDebug("Points: %.0f", pointsNum);
+	logDebug("Points: %u", cloud.size());
 }
 
 void ThreephaseEngine::setOption(const std::string& key, const float& value) {
@@ -328,14 +335,18 @@ void ThreephaseEngine::setOption(const std::string& key, const float& value) {
 }
 
 void ThreephaseEngine::setParameter(const std::string& key, const std::string& value) {
-
+	if (options_.count(key) == 0) {
+		logWarning("ThreephaseEngine wrong parameter: " + key);
+		return;
+	}
+	options_[key] = boost::lexical_cast<float>(value);
 }
 
 void ThreephaseEngine::setImage(const std::string& id, const cv::Mat& image) {
-	std::vector < std::string > params;
+	std::vector<std::string> params;
 	boost::split(params, id, boost::is_any_of(":"));
 	auto orientation = params[0];
-	auto phase = boost::lexical_cast < size_t > (params[1]);
+	auto phase = boost::lexical_cast<size_t>(params[1]);
 	this->setImage(orientation, phase, image);
 }
 

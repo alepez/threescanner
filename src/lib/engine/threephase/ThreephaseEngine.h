@@ -16,12 +16,6 @@
 
 namespace threescanner {
 
-struct RawPointCloud {
-	static const size_t MAX_SIZE = (1024 * 768);
-	size_t size_;
-	float data_[3 * MAX_SIZE];
-};
-
 class ThreephaseEngine: public Engine {
 public:
 	ThreephaseEngine(const Config& cfg, ImageInput* input);
@@ -58,8 +52,6 @@ private:
 	cv::Mat mask_;
 
 	cv::Mat depth_;
-
-	RawPointCloud* rawCloud_;
 };
 
 } /* namespace threescanner */

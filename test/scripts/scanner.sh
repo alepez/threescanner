@@ -12,6 +12,8 @@ function send_commands {
   (
     echo "scan"
     sleep 2
+    echo "save output-$( date +%Y%m%d-%H%M ).pcd"
+    sleep 0.5
     echo "quit"
   ) | nc localhost 11601
 }
