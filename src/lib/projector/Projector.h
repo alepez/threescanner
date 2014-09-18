@@ -8,6 +8,7 @@
 #define threescanner_PROJECTOR_H_
 
 #include "../prerequisites.h"
+#include "../net/TcpServer.h"
 
 #include <string>
 #include <GL/glew.h>
@@ -17,13 +18,16 @@ struct GLFWwindow;
 
 namespace threescanner {
 
-class Projector {
+class Projector: public TcpServer {
 public:
 	void run();
 protected:
 	Projector(const std::string& type, const Config&);
 	virtual ~Projector();
+	virtual void setParameters(const std::string& key, const std::string& value);
+	GLuint getProgramID();
 private:
+	virtual void handleAction(const std::string& action, const std::vector<std::string>& params);
 	void setupWindow(const Config& cfg);
 	void render();
 	const std::string engineType_;

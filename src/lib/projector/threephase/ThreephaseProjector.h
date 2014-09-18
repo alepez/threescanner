@@ -15,6 +15,8 @@ class ThreephaseProjector: public Projector {
 public:
 	ThreephaseProjector(const Config& cfg);
 	virtual ~ThreephaseProjector();
+private:
+	virtual void setParameters(const std::string& key, const std::string& value);
 };
 
 } /* namespace threescanner */
