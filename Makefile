@@ -51,20 +51,16 @@ INCLUDE_DIRS += /usr/include/pcl-1.7
 INCLUDE_DIRS += /usr/include/eigen3
 
 ## LIBRARIES
-LIBRARIES += pcl_common
-LIBRARIES += pcl_io
-LIBRARIES += pcl_filters
-LIBRARIES += pcl_visualization
+LIBRARIES += boost_system
+LIBRARIES += boost_thread
 LIBRARIES += opencv_highgui
 LIBRARIES += opencv_imgproc
 LIBRARIES += opencv_core
-LIBRARIES += opencv_contrib
-LIBRARIES += boost_system
-LIBRARIES += boost_thread
+LIBRARIES += pcl_common
+LIBRARIES += pcl_io
 LIBRARIES += GLEW
 LIBRARIES += glfw
 LIBRARIES += GL
-LIBRARIES += rt
 
 LIBRARY_DIRS := $(THIRD_PARTY_LIB_DIR)
 
@@ -127,7 +123,7 @@ $(HEADERS_DIST_DIR)/%.h: $(LIB_SRC_DIR)/%.h
 	cp $< $@
 
 test:
-	for testScript in $(wildcard test/scripts/*); do echo $$testScript; $$testScript; done
+	for testScript in $(wildcard test/scripts/auto_*); do echo $$testScript; $$testScript; done
 
 executables: $(EXECUTABLES)
 
