@@ -5,9 +5,6 @@
  */
 
 #include "ThreephaseEngine.h"
-
-//#include <calibration/ThreePhase.h>
-//#include <calibration/SharedPointCloud.h>
 #include "../../common/Logger.h"
 #include "../../common/Config.h"
 
@@ -21,21 +18,24 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <boost/foreach.hpp>
 
+/*
+ * http://public.vrac.iastate.edu/~song/publications/papers/2010-ole-review.pdf
+ */
+
 namespace threescanner {
 
-/* Documentazione dell'algoritmo:
- *  - http://public.vrac.iastate.edu/~song/publications/papers/2010-ole-review.pdf
- */
+namespace /* anonymous */{
+
+static const int WRAP_V_SIZE = 511; /* i1 - i3, -255 to 255, |511| */
+static const int WRAP_U_SIZE = 1021; /* 2 * i2 - i1 - i3, -510 to 510, |1021| */
+static const int WRAP_V_OFFSET = 255; /* min value is -255 */
+static const int WRAP_U_OFFSET = 510; /* min value is -510 */
+static unsigned char PHASE_GAMMA_LUT[WRAP_V_SIZE][WRAP_U_SIZE][2];
 
 /*
- * PHASE_GAMMA_LUT e` inizializzato prima di chiamare main()
+ * initPhaseGammaLut() is automatically called once at startup
  */
-static const int WRAP_V_SIZE = 511; // i1 - i3, -255 to 255, |511|
-static const int WRAP_U_SIZE = 1021; // 2 * i2 - i1 - i3, -510 to 510, |1021|
-static const int WRAP_V_OFFSET = 255; // min value is -255
-static const int WRAP_U_OFFSET = 510; // min value is -510
-static unsigned char PHASE_GAMMA_LUT[WRAP_V_SIZE][WRAP_U_SIZE][2];
-static void initPhaseGammaLut() __attribute__ ((constructor)); /* FIXME: solo gcc */
+void initPhaseGammaLut() __attribute__ ((constructor)); /* FIXME: only gcc is compatible */
 void initPhaseGammaLut() {
 	float sqrt3 = sqrtf(3.0);
 	float ipi = float(128. / CV_PI);
@@ -51,41 +51,15 @@ void initPhaseGammaLut() {
 	}
 }
 
-static bool isVertical(const std::string& orientation) {
+bool isVertical(const std::string& orientation) {
 	return orientation[0] == 'v' || orientation[0] == 'V';
 }
 
-static bool isHorizontal(const std::string& orientation) {
+bool isHorizontal(const std::string& orientation) {
 	return orientation[0] == 'h' || orientation[0] == 'H';
 }
 
-struct RawPoint {
-	float x, y, z;
-};
-
-static inline bool isInside(glm::vec4 p, const float* box) {
-	if (p.x < box[0]) {
-		return false;
-	}
-	if (p.x > box[1]) {
-		return false;
-	}
-	if (p.y < box[2]) {
-		return false;
-	}
-	if (p.y > box[3]) {
-		return false;
-	}
-	if (p.z < box[4]) {
-		return false;
-	}
-	if (p.z > box[5]) {
-		return false;
-	}
-	return true;
-}
-
-static void traceMatrix(const std::string& name, const glm::mat4& mat) {
+void traceMatrix(const std::string& name, const glm::mat4& mat) {
 	const float* a = (const float*) glm::value_ptr(mat);
 	logDebug("%16s | %8.3f %8.3f %8.3f %8.3f", name.c_str(), a[0], a[4], a[8], a[12]);
 	logDebug("                 | %8.3f %8.3f %8.3f %8.3f", a[1], a[5], a[9], a[13]);
@@ -93,9 +67,10 @@ static void traceMatrix(const std::string& name, const glm::mat4& mat) {
 	logDebug("                 | %8.3f %8.3f %8.3f %8.3f", a[3], a[7], a[11], a[15]);
 }
 
+} /* namespace anonymous */
+
 ThreephaseEngine::ThreephaseEngine(const Config& cfg) :
 				Engine(cfg),
-				debugEnabled_(cfg.get<bool>("debug")),
 				wrapMethod_(cfg.get<int>("wrapMethod")),
 				options_(),
 				toProcess_(),
@@ -118,74 +93,10 @@ ThreephaseEngine::ThreephaseEngine(const Config& cfg) :
 	options_["znoise"] = tuning.get<float>("znoise", 0.720);
 	options_["zblur"] = tuning.get<float>("zblur", 16);
 
-	/* translate */
-	Config translate = cfg.getChild("translate");
-	translate_.x = translate.get<float>("x", 0.0);
-	translate_.y = translate.get<float>("y", 0.0);
-	translate_.z = translate.get<float>("z", 0.0);
-
-	/* rotate */
-	Config rotate = cfg.getChild("rotate");
-	rotate_.x = rotate.get<float>("x", 0.0);
-	rotate_.y = rotate.get<float>("y", 0.0);
-	rotate_.z = rotate.get<float>("z", 0.0);
-
-	/* scale */
-	Config scale = cfg.getChild("scale");
-	scale_.x = scale.get<float>("x", 1.0);
-	scale_.y = scale.get<float>("y", 1.0);
-	scale_.z = scale.get<float>("z", 1.0);
-
-	this->updateAffine();
-
-	/* crop */
-	Config crop = cfg.getChild("crop");
-	crop_["xmin"] = crop.get<float>("xmin", -1.0);
-	crop_["xmax"] = crop.get<float>("xmax", 1.0);
-	crop_["ymin"] = crop.get<float>("ymin", -1.0);
-	crop_["ymax"] = crop.get<float>("ymax", 1.0);
-	crop_["zmin"] = crop.get<float>("zmin", -1.0);
-	crop_["zmax"] = crop.get<float>("zmax", 1.0);
 }
 
 ThreephaseEngine::~ThreephaseEngine() {
 
-}
-
-void ThreephaseEngine::updateAffine() {
-	glm::mat4 translation = glm::translate(translate_);
-
-	static const glm::vec3 AXIS_X = glm::vec3(1.0, 0.0, 0.0);
-	static const glm::vec3 AXIS_Y = glm::vec3(0.0, 1.0, 0.0);
-	static const glm::vec3 AXIS_Z = glm::vec3(0.0, 0.0, 1.0);
-	glm::mat4 rotx = glm::rotate(rotate_.x, AXIS_X);
-	glm::mat4 roty = glm::rotate(rotate_.y, AXIS_Y);
-	glm::mat4 rotz = glm::rotate(rotate_.z, AXIS_Z);
-//	traceMatrix("rotx", rotx);
-//	traceMatrix("roty", roty);
-//	traceMatrix("rotz", rotz);
-
-	glm::mat4 scale = glm::scale(scale_);
-
-	//affine_ = glm::mat4(1.0) * translation * rotx * roty * rotz * scale;
-	affine_ = glm::mat4(1.0);
-	affine_ = affine_ * translation;
-	affine_ = affine_ * rotx;
-	affine_ = affine_ * roty;
-	affine_ = affine_ * rotz;
-	affine_ = scale * affine_; /* scale va applicata dopo tutto per mantenere il centro */
-
-//	traceMatrix("transformation", affine_);
-}
-
-void ThreephaseEngine::loadImagesFromFs(const std::string& filePathPattern) {
-	for (size_t phase = 0; phase < 3; ++phase) {
-		auto filepath = fmt::sprintf(filePathPattern.c_str(), phase + 1);
-		hImages_[phase] = cv::imread(filepath, CV_LOAD_IMAGE_GRAYSCALE);
-		if (hImages_[phase].rows) {
-			logInfo("Loaded test image for phase %i from %s %i", phase + 1, filepath.c_str(), hImages_[phase].flags);
-		}
-	}
 }
 
 void ThreephaseEngine::setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image) {
@@ -204,10 +115,8 @@ void ThreephaseEngine::process(const std::string& orientation) {
 		phases_ = vImages_;
 	} else if (isHorizontal(orientation)) {
 		phases_ = hImages_;
-	} else if (orientation == "last") {
-		if (phases_ == nullptr) {
-			throw std::runtime_error("Last orientation is undefined");
-		}
+	} else if (orientation == "last" && phases_ == nullptr) {
+		throw std::runtime_error("Last orientation is undefined");
 	} else {
 		throw std::runtime_error("Invalid orientation");
 	}
@@ -225,30 +134,6 @@ void ThreephaseEngine::process(const std::string& orientation) {
 	this->blurMask();
 	this->computeDepth(zscale - mscale, zskew - mscale);
 	this->saveToCloud();
-
-	if (debugEnabled_) {
-		cv::imshow(fmt::sprintf("phase%u", 0 + 1), phases_[0]);
-		cv::imshow(fmt::sprintf("phase%u", 1 + 1), phases_[1]);
-		cv::imshow(fmt::sprintf("phase%u", 2 + 1), phases_[2]);
-
-		cv::Mat dm;
-		depth_.convertTo(dm, CV_8UC1);
-		cv::Mat dmj;
-		cv::applyColorMap(dm, dmj, cv::COLORMAP_JET);
-		cv::imshow("depth", dmj);
-
-		cv::Mat ms;
-		mask_.convertTo(ms, CV_8U, 200);
-		cv::imshow("mask", ms);
-
-		cv::Mat uv;
-		unwrapped_.convertTo(uv, CV_8U, 80, 127);
-		cv::imshow("unwrapped", uv);
-
-		cv::Mat pm;
-		process_.convertTo(pm, CV_8UC1, 200);
-		cv::imshow("process", pm);
-	}
 }
 
 void ThreephaseEngine::blurMask() {
@@ -364,10 +249,6 @@ void ThreephaseEngine::computeDepth(float zscale, float zskew) {
 	}
 }
 
-uchar ThreephaseEngine::mix(int r, int c) {
-	return uchar(int(phases_[0].at<uchar>(r, c) + phases_[1].at<uchar>(r, c) + phases_[2].at<uchar>(r, c)) / 3);
-}
-
 void ThreephaseEngine::setup() {
 	int w = phases_[0].cols;
 	int h = phases_[0].rows;
@@ -376,10 +257,6 @@ void ThreephaseEngine::setup() {
 	depth_ = cv::Mat::zeros(h, w, CV_32F);
 	mask_ = cv::Mat::zeros(h, w, CV_8U);
 	process_ = cv::Mat::zeros(h, w, CV_8U);
-}
-
-void ThreephaseEngine::setOutput(RawPointCloud* rawCloud) {
-	rawCloud_ = rawCloud;
 }
 
 void ThreephaseEngine::saveToCloud() {
@@ -393,7 +270,6 @@ void ThreephaseEngine::saveToCloud() {
 	const float zscale = options_["zscale"];
 	const float mscale = options_["mscale"];
 	const float zskew = options_["zskew"];
-	const float cloudScale = options_["cloudScale"];
 	const float scale = zscale - mscale;
 	float skew = zskew - mscale;
 	if (skew == 0.0) {
@@ -402,49 +278,31 @@ void ThreephaseEngine::saveToCloud() {
 	int width = depth_.cols;
 	int height = depth_.rows;
 
+	struct RawPoint {
+		float x, y, z;
+	};
+
 	RawPoint* rowCloudData = reinterpret_cast<RawPoint*>(rawCloud_->data_);
 	RawPoint* rcd = rowCloudData;
 
-	RawPoint barycenter = { 0.0, 0.0, 0.0 };
-
 	float pointsNum = 0.0;
-
-	/* ottimizzazione */
-	float crop[] = { crop_["xmin"], crop_["xmax"], crop_["ymin"], crop_["ymax"], crop_["zmin"], crop_["zmax"] };
 
 	for (int y = 0; y < height; ++y) {
 		float planephase = 0.5 + float(y - (height / 2)) / skew;
 		for (int x = 0; x < width; ++x) {
 			if (!mask_.at<uchar>(y, x)) {
 				float z = (unwrapped_.at<float>(y, x) - planephase) * scale;
-				/* WARNING: y z  sono invertiti */
-				/* vec4 serve solo per la trasformazione affine, in realta` basterebbe vec3
-				 * w e` 1.0 e non 0.0 perche` altrimenti non funziona la traslazione
-				 */
-				glm::vec4 p(x * cloudScale, -y * cloudScale, -z * cloudScale, 1.0);
-				p = affine_ * p;
-				if (isInside(p, crop)) {
-					rcd->x = p.x;
-					rcd->y = p.y;
-					rcd->z = p.z;
-					barycenter.x += p.x;
-					barycenter.y += p.y;
-					barycenter.z += p.z;
-					pointsNum += 1.0;
-					++rcd;
-				}
+				rcd->x = x;
+				rcd->y = y;
+				rcd->z = z;
+				pointsNum += 1.0;
+				++rcd;
 			}
 		}
 	}
 
 	rawCloud_->size_ = pointsNum;
-
-	barycenter.x /= pointsNum;
-	barycenter.y /= pointsNum;
-	barycenter.z /= pointsNum;
-
 	logDebug("Points: %.0f", pointsNum);
-	logDebug("Barycenter: %.3f, %.3f, %.3f", barycenter.x, barycenter.y, barycenter.z);
 }
 
 void ThreephaseEngine::setOption(const std::string& key, const float& value) {
@@ -454,78 +312,12 @@ void ThreephaseEngine::setOption(const std::string& key, const float& value) {
 	options_[key] = value;
 }
 
-void ThreephaseEngine::setCrop(const std::string& key, const float& value) {
-	if (!crop_.count(key)) {
-		logWarning("ThreePhase crop key does not exist: " + key);
-	}
-	crop_[key] = value;
-	this->saveToCloud();
-}
-
-void ThreephaseEngine::setTrans(const std::string& key, const float& value) {
-	if (key.size() != 1) {
-		/* ignora */
-		return;
-	}
-	switch (key[0]) {
-	case 'x':
-		translate_.x = value;
-		break;
-	case 'y':
-		translate_.y = value;
-		break;
-	case 'z':
-		translate_.z = value;
-		break;
-	}
-	this->updateAffine();
-}
-
-void ThreephaseEngine::setRotation(const std::string& key, const float& value) {
-	if (key.size() != 1) {
-		/* ignora */
-		return;
-	}
-	switch (key[0]) {
-	case 'x':
-		rotate_.x = value;
-		break;
-	case 'y':
-		rotate_.y = value;
-		break;
-	case 'z':
-		rotate_.z = value;
-		break;
-	}
-	this->updateAffine();
-}
-
-void ThreephaseEngine::setScale(const std::string& key, const float& value) {
-	if (key.size() != 1) {
-		/* ignora */
-		return;
-	}
-	switch (key[0]) {
-	case 'x':
-		scale_.x = value;
-		break;
-	case 'y':
-		scale_.y = value;
-		break;
-	case 'z':
-		scale_.z = value;
-		break;
-	case '*':
-		scale_.x = value;
-		scale_.y = value;
-		scale_.z = value;
-		break;
-	}
-	this->updateAffine();
-}
-
 void ThreephaseEngine::setParameter(const std::string& key, const std::string& value) {
-	/* must be reimplemented by derived class */
+
+}
+
+void ThreephaseEngine::setImage(const std::string& id, const cv::Mat& image) {
+
 }
 
 } /* namespace threescanner */
