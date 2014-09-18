@@ -7,6 +7,7 @@
 
 #include "Shaders.h"
 #include "../common/Logger.h"
+
 #include <fstream>
 #include <vector>
 #include <algorithm>
@@ -67,17 +68,17 @@ void Shaders::loadShader(GLuint programID, const std::string& name, const GLenum
 		}
 		fs.close();
 	} else {
-		/* ignora, file non leggibile */
+		/* ignore, not readable */
 		return;
 	}
 
-	// Compile Vertex Shader
+	/* Compile Vertex Shader */
 	logDebug("Compiling shader: " + filePath);
 	const char* source = shaderCode.c_str();
 	glShaderSource(shaderID, 1, &source, NULL);
 	glCompileShader(shaderID);
 
-	// Check Vertex Shader
+	/* Check Vertex Shader */
 	GLint result = GL_FALSE;
 	int infoLen = 0;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);

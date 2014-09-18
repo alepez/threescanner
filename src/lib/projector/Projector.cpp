@@ -9,20 +9,9 @@
 #include "../common/Logger.h"
 #include "threephase/ThreephaseProjector.h"
 #include "Quad.h"
-
 #include "Shaders.h"
 
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-
-using namespace glm;
-using boost::lexical_cast;
-using namespace boost;
 
 namespace threescanner {
 
@@ -96,9 +85,6 @@ void Projector::render() {
 }
 
 GLFWmonitor* selectMonitor(const std::string& name) {
-	if (name == "none") {
-		return nullptr;
-	}
 	int count = 0;
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
 	for (int i = 0; i != count; ++i) {
@@ -107,7 +93,8 @@ GLFWmonitor* selectMonitor(const std::string& name) {
 			return monitor;
 		}
 	}
-	throw std::runtime_error("Cannot find monitor " + name);
+	logError("Cannot find monitor " + name);
+	return nullptr;
 }
 
 } /* namespace threescanner */
