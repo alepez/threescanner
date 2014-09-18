@@ -7,6 +7,9 @@ With this software you can get a three dimensional point cloud of a real object.
 
 You only need a camera (even a webcam) and a projector.
 
+You can use the provided scanner+projector applications or include the library
+in your own project using the API.
+
 Projector and scanner are in separate processes and they communicate via tcp,
 so they can reside in different computers.
 
@@ -14,8 +17,16 @@ so they can reside in different computers.
 be used .
 
 At the moment, only [*ThreePhase* by *Kyle McDonald*](https://code.google.com/p/structured-light/)
-algorithm is implemented, but it's possible to add [other implementation](https://sites.google.com/site/structuredlight/techniques), like *binary codes*, *gray codes* etc...
+algorithm is implemented, but it's possible to add [other implementations](https://sites.google.com/site/structuredlight/techniques),
+like *binary codes*, *gray codes* etc...
 
+**THIS PROJECT ISN'T FINISHED YET**
+
+What to do to have a working scanner:
+
+ - input from camera (with opencv)
+ - threephase: syncronization between scanner (camera) and projector
+ - a GUI
 
 ## Build
 

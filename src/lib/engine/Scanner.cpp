@@ -55,7 +55,12 @@ void Scanner::handleAction(const std::string& action, const std::vector<std::str
 }
 
 void Scanner::saveCloud(const std::string& filepath) {
-	pcl::io::savePCDFile(filepath, *engine_->getCloud());
+	try {
+		pcl::io::savePCDFile(filepath, *engine_->getCloud());
+		logInfo("PointCloud saved to " + filepath);
+	} catch (const std::exception& e) {
+		logError("Cannot save PointCloud to " + filepath + ": " + e.what());
+	}
 }
 
 } /* namespace threescanner */
