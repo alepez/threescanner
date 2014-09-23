@@ -21,6 +21,14 @@ OBJS := $(CXX_OBJS)
 OBJS_DIRS := $(dir $(OBJS))
 
 ###############################################################################
+## UNIT TESTS
+UNIT_TESTS_DIR := test/unit
+UNIT_TESTS_BUILD_DIR := tmp/test/unit
+UNIT_TESTS_SRC := $(shell find $(UNIT_TESTS_DIR) -name "*.cpp")
+UNIT_TESTS_OBJ := $(addprefix $(UNIT_TESTS_BUILD_DIR)/, $(patsubst $(UNIT_TESTS_DIR)/%,%,$(patsubst %.cpp,%.o,$(UNIT_TESTS_SRC))))
+UNIT_TESTS_EXE := tmp/test/unit/test-all
+
+###############################################################################
 ## DIST
 
 ## LIBRARIES OUTPUT
@@ -122,7 +130,17 @@ $(HEADERS_DIST_DIR)/%.h: $(LIB_SRC_DIR)/%.h
 	mkdir -p $(dir $@)
 	cp $< $@
 
-test:
+$(UNIT_TESTS_BUILD_DIR)/%.o: $(UNIT_TESTS_DIR)/%.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(UNIT_TESTS_EXE): $(UNIT_TESTS_OBJ) $(OBJS)
+	$(CXX) -o $@ -lgtest -lgmock $(LDFLAGS) $(UNIT_TESTS_OBJ) $(OBJS)
+
+unit_test: $(UNIT_TESTS_EXE)
+	cd test/mocks && ../../tmp/test/unit/test-all
+
+test: executables unit_test
 	for testScript in $(wildcard test/scripts/auto_*); do echo $$testScript; $$testScript; done
 
 executables: $(EXECUTABLES)
@@ -132,7 +150,7 @@ libraries: $(LIB_STATIC) $(LIB_SHARED)
 includes: $(HEADERS_DIST)
 
 ## build libraries and executables
-all: libraries executables
+all: libraries executables $(UNIT_TESTS_EXE)
 
 ## build libraries executables and miscellaneus
 dist: all includes

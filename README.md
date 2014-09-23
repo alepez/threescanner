@@ -20,7 +20,7 @@ At the moment, only [*ThreePhase* by *Kyle McDonald*](https://code.google.com/p/
 algorithm is implemented, but it's possible to add [other implementations](https://sites.google.com/site/structuredlight/techniques),
 like *binary codes*, *gray codes* etc...
 
-**THIS PROJECT ISN'T FINISHED YET**
+**THIS PROJECT ISN'T USABLE YET**
 
 What to do to have a working scanner:
 
@@ -48,8 +48,11 @@ Build debug version:
 
     make DEBUG=1 all
 
-Test scripts are `test/mocks/` and automatic tests start with `auto_`.  
-Automatic tests can be called with `make test`. 
+Test scripts are in `test/scripts/` and automatic tests start with `auto_`.  
+Automatic tests can be called with `make test`.
+
+Unit tests are in `test/unit` and can be called with `make unit_test`.  
+You need to install [gmock](https://code.google.com/p/googlemock/) first. 
 
 ## What is structured light?
 

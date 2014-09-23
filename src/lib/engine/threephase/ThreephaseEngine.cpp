@@ -82,16 +82,15 @@ ThreephaseEngine::ThreephaseEngine(const Config& cfg, ImageInput* input) :
 				unwrapped_(),
 				mask_(),
 				depth_() {
-
 	/* tuning */
 	Config tuning = cfg.getChild("tuning");
 
 	options_["mscale"] = tuning.get<float>("mscale", 200.0);
 	options_["zscale"] = tuning.get<float>("zscale", 151.0);
 	options_["zskew"] = tuning.get<float>("zskew", 180.0);
-	options_["cloudScale"] = tuning.get<float>("cloudScale", 1.0);
 	options_["znoise"] = tuning.get<float>("znoise", 0.720);
 	options_["zblur"] = tuning.get<float>("zblur", 16);
+	options_["cloudScale"] = tuning.get<float>("cloudScale", 1.0);
 
 }
 
@@ -106,9 +105,11 @@ void ThreephaseEngine::startScan() {
 	static const std::string filePathPattern = "phase%u.png";
 	for (size_t phase = 0; phase < 3; ++phase) {
 		auto filepath = fmt::sprintf(filePathPattern, phase + 1);
-		hImages_[phase] = cv::imread(filepath, CV_LOAD_IMAGE_GRAYSCALE);
-		if (hImages_[phase].rows) {
+		cv::Mat image = cv::imread(filepath);
+		if (image.rows) {
 			logInfo("Loaded test image for phase %i from %s %i", phase + 1, filepath.c_str(), hImages_[phase].flags);
+			auto imageId = fmt::sprintf("h:%u", phase + 1);
+			this->setImage(imageId, image);
 		}
 	}
 	/* --- */
@@ -117,14 +118,13 @@ void ThreephaseEngine::startScan() {
 }
 
 void ThreephaseEngine::setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image) {
-	logDebug("ThreePhase save image %u", phase);
-	if (phase > 2) {
-		throw std::runtime_error(fmt::sprintf("ThreePhase invalid phase: %u", phase));
+	if (phase > 3) {
+		throw std::runtime_error(fmt::sprintf("Threephase invalid phase: %u", phase));
 	}
-
 	cv::Mat* phases = isVertical(orientation) ? vImages_ : hImages_;
-	cv::Mat& dst = phases[phase];
+	cv::Mat& dst = phases[phase - 1];
 	cv::cvtColor(image, dst, CV_RGB2GRAY);
+	logDebug("Threephase set image %u", phase);
 }
 
 void ThreephaseEngine::process(const std::string& orientation) {
@@ -150,7 +150,7 @@ void ThreephaseEngine::process(const std::string& orientation) {
 	this->unwrap();
 	this->blurMask();
 	this->computeDepth(zscale - mscale, zskew - mscale);
-	this->saveToCloud();
+	this->createCloud();
 }
 
 void ThreephaseEngine::blurMask() {
@@ -269,14 +269,14 @@ void ThreephaseEngine::computeDepth(float zscale, float zskew) {
 void ThreephaseEngine::setup() {
 	int w = phases_[0].cols;
 	int h = phases_[0].rows;
-	logDebug("ThreePhase setup %ux%u", w, h);
+	logDebug("Threephase setup %ux%u", w, h);
 	unwrapped_ = cv::Mat::zeros(h, w, CV_32F);
 	depth_ = cv::Mat::zeros(h, w, CV_32F);
 	mask_ = cv::Mat::zeros(h, w, CV_8U);
 	process_ = cv::Mat::zeros(h, w, CV_8U);
 }
 
-void ThreephaseEngine::saveToCloud() {
+void ThreephaseEngine::createCloud() {
 	logDebug("Save to cloud");
 	/*
 	 * TODO: controlla che il risultato sia corretto prima di salvare la point cloud.
@@ -329,17 +329,18 @@ void ThreephaseEngine::saveToCloud() {
 
 void ThreephaseEngine::setOption(const std::string& key, const float& value) {
 	if (!options_.count(key)) {
-		logWarning("ThreePhase option does not exist: " + key);
+		throw std::invalid_argument("Threephase option does not exist: " + key);
 	}
 	options_[key] = value;
 }
 
 void ThreephaseEngine::setParameter(const std::string& key, const std::string& value) {
-	if (options_.count(key) == 0) {
-		logWarning("ThreephaseEngine wrong parameter: " + key);
-		return;
+	std::vector<std::string> k;
+	boost::split(k, key, boost::is_any_of(":"));
+	if (k[0] == "tuning" && k.size() == 2) {
+		return this->setOption(k[1], boost::lexical_cast<float>(value));
 	}
-	options_[key] = boost::lexical_cast<float>(value);
+	throw std::invalid_argument("Threephase invalid parameter: " + key);
 }
 
 void ThreephaseEngine::setImage(const std::string& id, const cv::Mat& image) {
