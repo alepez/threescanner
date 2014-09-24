@@ -24,9 +24,7 @@ public:
 	virtual void stop();
 private:
 	void configure(const Config&);
-	void setup(const Config&);
 	void run();
-	void show();
 	cv::VideoCapture* cap_;
 	std::thread* thread_;
 	volatile bool continueRunning_;
