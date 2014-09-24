@@ -19,10 +19,7 @@ EnginePtr Engine::create(const std::string& type, const Config& cfg, ImageInput*
 
 EnginePtr Engine::create(const Config& cfg, ImageInput* input) {
 	const std::string& type = cfg.get<std::string>("type");
-	if (type == "threephase") {
-		return EnginePtr(new ThreephaseEngine(cfg, input));
-	}
-	throw std::invalid_argument("Cannot intantiate Engine of type " + type);
+	return Engine::create(type, cfg, input);
 }
 
 //static const unsigned MAX_POINTS = (1024 * 1024); TODO: optimization

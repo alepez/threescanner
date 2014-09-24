@@ -16,6 +16,18 @@
 
 namespace threescanner {
 
+ProjectorPtr Projector::create(const std::string& type, const Config& cfg) {
+	if (type == "threephase") {
+		return ProjectorPtr(new ThreephaseProjector(cfg));
+	}
+	throw std::invalid_argument("Cannot intantiate Engine of type " + type);
+}
+
+ProjectorPtr Projector::create(const Config& cfg) {
+	const std::string& type = cfg.get<std::string>("type");
+	return Projector::create(type, cfg);
+}
+
 static GLFWmonitor* selectMonitor(const std::string& name);
 
 Projector::Projector(const std::string& type, const Config& cfg) :
@@ -100,7 +112,7 @@ void Projector::handleAction(const std::string& action, const std::vector<std::s
 		this->setParameters(params[0], params[1]);
 		return;
 	}
-	logWarning("Projector: unknown action: " + action);
+	throw std::invalid_argument("Projector: unknown action: " + action);
 }
 
 void Projector::setParameters(const std::string&, const std::string&) {
@@ -116,7 +128,9 @@ GLFWmonitor* selectMonitor(const std::string& name) {
 			return monitor;
 		}
 	}
-	logError("Cannot find monitor " + name);
+	if (name != "none") {
+		logError("Cannot find monitor " + name);
+	}
 	return nullptr;
 }
 

@@ -5,9 +5,6 @@
 #include <scanner/Scanner.h>
 #include <scanner/Engine.h>
 
-#include <format.h>
-#include <opencv2/highgui/highgui.hpp>
-
 using namespace ::threescanner;
 using namespace ::testing;
 
