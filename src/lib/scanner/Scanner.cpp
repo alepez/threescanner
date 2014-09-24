@@ -39,7 +39,7 @@ void Scanner::handleAction(const std::string& action, const std::vector<std::str
 		return;
 	}
 	if (action == "scan") {
-		engine_->startScan();
+		engine_->scan();
 		return;
 	}
 	if (action == "save") {

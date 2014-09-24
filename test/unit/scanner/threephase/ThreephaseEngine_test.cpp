@@ -3,6 +3,7 @@
 
 #include <common/Config.h>
 #include <scanner/threephase/ThreephaseEngine.h>
+#include <input/ImageInput.h>
 
 #include <format.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -50,4 +51,13 @@ TEST_F(ThreephaseEngine_, CannotSetInvalidParameters) {
 	ASSERT_THROW(engine.setParameter("tuning", tuningCfg.get<std::string>("zscale")), std::invalid_argument);
 	ASSERT_THROW(engine.setParameter("tuni**skew", tuningCfg.get<std::string>("zskew")), std::invalid_argument);
 	ASSERT_THROW(engine.setParameter("tuningd:cloudScale", tuningCfg.get<std::string>("cloudScale")), std::invalid_argument);
+}
+
+TEST_F(ThreephaseEngine_, CanAttachInput) {
+	ASSERT_NO_THROW(engine.setInput(ImageInput::create(Config("fsInput.json"))));
+}
+
+TEST_F(ThreephaseEngine_, CanScan) {
+	engine.setInput(ImageInput::create(Config("fsInput.json")));
+	ASSERT_NO_THROW(engine.scan());
 }

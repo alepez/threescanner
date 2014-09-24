@@ -29,5 +29,12 @@ TEST_F(Engine_, ShouldNotInstantiateWrongType) {
 TEST_F(Engine_, CanSetInput) {
 	EnginePtr engine = Engine::create("threephase", cfg);
 	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
+	ASSERT_NO_THROW(engine->setInput(input));
+}
+
+TEST_F(Engine_, CannotSetInputIfAlreadyPresent) {
+	EnginePtr engine = Engine::create("threephase", cfg);
+	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
 	engine->setInput(input);
+	ASSERT_THROW(engine->setInput(input), std::invalid_argument);
 }

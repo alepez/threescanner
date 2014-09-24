@@ -22,8 +22,8 @@ public:
 	virtual ~ThreephaseEngine();
 	virtual void setParameter(const std::string& key, const std::string& value);
 	virtual void setImage(const std::string& id, const cv::Mat& image);
+	virtual void scan();
 private:
-	virtual void startScan();
 	void setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image);
 	void process(const std::string& orientation = "last");
 	void setOption(const std::string& key, const float& value);

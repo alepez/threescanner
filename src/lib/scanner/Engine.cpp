@@ -33,6 +33,9 @@ Engine::~Engine() {
 }
 
 void Engine::setInput(ImageInputPtr input) {
+	if (input_.get() != nullptr) {
+		throw std::invalid_argument("Engine: cannot set input if already defined.");
+	}
 	input_ = input;
 }
 

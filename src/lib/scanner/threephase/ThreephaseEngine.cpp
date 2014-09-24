@@ -98,21 +98,11 @@ ThreephaseEngine::~ThreephaseEngine() {
 
 }
 
-void ThreephaseEngine::startScan() {
-	/* TODO: should get images from ImageInput (Camera)
-	 * not from filesystem
+void ThreephaseEngine::scan() {
+	/* TODO:
+	 * should tell to projector to project the pattern
+	 * should get images from ImageInput (Camera)
 	 */
-	static const std::string filePathPattern = "phase%u.png";
-	for (size_t phase = 0; phase < 3; ++phase) {
-		auto filepath = fmt::sprintf(filePathPattern, phase + 1);
-		cv::Mat image = cv::imread(filepath);
-		if (image.rows) {
-			logInfo("Loaded test image for phase %i from %s %i", phase + 1, filepath.c_str(), hImages_[phase].flags);
-			auto imageId = fmt::sprintf("h:%u", phase + 1);
-			this->setImage(imageId, image);
-		}
-	}
-	/* --- */
 	std::string orientation = "h"; /* TODO: from Config */
 	this->process(orientation);
 }
