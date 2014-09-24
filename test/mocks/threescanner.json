@@ -11,6 +11,9 @@
         "cloudScale": 1
       }
     },
+    "input": {
+    	
+    },
     "net": {
       "name": "Scanner",
       "port": 11601

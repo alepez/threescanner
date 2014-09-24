@@ -20,7 +20,7 @@ ProjectorPtr Projector::create(const std::string& type, const Config& cfg) {
 	if (type == "threephase") {
 		return ProjectorPtr(new ThreephaseProjector(cfg));
 	}
-	throw std::invalid_argument("Cannot intantiate Engine of type " + type);
+	throw std::invalid_argument("Cannot intantiate Projector of type " + type);
 }
 
 ProjectorPtr Projector::create(const Config& cfg) {
