@@ -44,7 +44,6 @@ TEST_F(ThreephaseEngine_, CanSetParameters) {
 	ASSERT_NO_THROW(engine.setParameter("tuning:zblur", tuningCfg.get<std::string>("zblur")));
 }
 
-
 TEST_F(ThreephaseEngine_, CannotSetInvalidParameters) {
 	Config tuningCfg = cfg.getChild("tuning");
 	ASSERT_THROW(engine.setParameter("mscale", tuningCfg.get<std::string>("mscale")), std::invalid_argument);

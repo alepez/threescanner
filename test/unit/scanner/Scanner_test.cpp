@@ -14,10 +14,16 @@ public:
 };
 
 TEST_F(Scanner_, CanInstantiateWithoutEngine) {
-	ASSERT_NO_THROW(Scanner instance(cfg, nullptr));
+	ASSERT_NO_THROW(Scanner instance(cfg));
 }
 
 TEST_F(Scanner_, CanInstantiateWithEngine) {
-	EnginePtr engine = Engine::create("threephase", cfg.getChild("engine"), nullptr);
+	EnginePtr engine = Engine::create("threephase", cfg.getChild("engine"));
 	ASSERT_NO_THROW(Scanner instance(cfg, engine));
+}
+
+TEST_F(Scanner_, CanSetEngineAfterInitialization) {
+	EnginePtr engine = Engine::create("threephase", cfg.getChild("engine"));
+	Scanner scanner(cfg);
+	scanner.setEngine(engine);
 }

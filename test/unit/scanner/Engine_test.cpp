@@ -3,6 +3,7 @@
 
 #include <common/Config.h>
 #include <scanner/Engine.h>
+#include <input/ImageInput.h>
 
 using namespace ::threescanner;
 using namespace ::testing;
@@ -13,14 +14,20 @@ public:
 };
 
 TEST_F(Engine_, CanInstantiateThreephaseType) {
-	ASSERT_NO_THROW(Engine::create("threephase", cfg, nullptr));
+	ASSERT_NO_THROW(Engine::create("threephase", cfg));
 }
 
 TEST_F(Engine_, CanInstantiateWithTypeSpecifiedInConfig) {
 	cfg.set<std::string>("type", "threephase");
-	ASSERT_NO_THROW(Engine::create(cfg, nullptr));
+	ASSERT_NO_THROW(Engine::create(cfg));
 }
 
 TEST_F(Engine_, ShouldNotInstantiateWrongType) {
-	ASSERT_THROW(Engine::create("wrong!!", cfg, nullptr), std::invalid_argument);
+	ASSERT_THROW(Engine::create("wrong!!", cfg), std::invalid_argument);
+}
+
+TEST_F(Engine_, CanSetInput) {
+	EnginePtr engine = Engine::create("threephase", cfg);
+	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
+	engine->setInput(input);
 }

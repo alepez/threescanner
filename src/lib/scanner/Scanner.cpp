@@ -63,4 +63,8 @@ void Scanner::saveCloud(const std::string& filepath) {
 	}
 }
 
+void Scanner::setEngine(EnginePtr engine) {
+	engine_ = engine;
+}
+
 } /* namespace threescanner */

@@ -70,8 +70,8 @@ void traceMatrix(const std::string& name, const glm::mat4& mat) {
 
 } /* namespace anonymous */
 
-ThreephaseEngine::ThreephaseEngine(const Config& cfg, ImageInput* input) :
-				Engine(cfg, input),
+ThreephaseEngine::ThreephaseEngine(const Config& cfg) :
+				Engine(cfg),
 				wrapMethod_(cfg.get<int>("wrapMethod")),
 				options_(),
 				toProcess_(),

@@ -18,7 +18,7 @@ namespace threescanner {
 
 class ThreephaseEngine: public Engine {
 public:
-	ThreephaseEngine(const Config& cfg, ImageInput* input = nullptr);
+	ThreephaseEngine(const Config& cfg);
 	virtual ~ThreephaseEngine();
 	virtual void setParameter(const std::string& key, const std::string& value);
 	virtual void setImage(const std::string& id, const cv::Mat& image);
