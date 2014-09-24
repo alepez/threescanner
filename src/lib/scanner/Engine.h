@@ -10,13 +10,17 @@
 #include "../prerequisites.h"
 #include "PointCloud.h"
 
-#include <string>
 #include <opencv2/core/core.hpp>
+#include <string>
+#include <memory>
 
 namespace threescanner {
 
 class Engine {
 public:
+	typedef std::shared_ptr<Engine> Ptr;
+	static Ptr create(const std::string& type, const Config& cfg, ImageInput* input);
+	static Ptr create(const Config& cfg, ImageInput* input);
 	void run();
 	virtual ~Engine();
 	virtual void startScan() = 0;
