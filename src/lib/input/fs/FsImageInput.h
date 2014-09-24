@@ -16,6 +16,8 @@ public:
 	FsImageInput(const Config& cfg);
 	virtual ~FsImageInput();
 	virtual ImagePtr grabImage();
+	virtual void start();
+	virtual void stop();
 private:
 	std::vector<ImagePtr> images_;
 	size_t index_;

@@ -17,7 +17,7 @@ FsImageInput::FsImageInput(const Config& cfg) :
 				index_(0) {
 	auto path = cfg.get<std::string>("path");
 	auto files = cfg.getChild("files").getAll<std::string>();
-	for (auto file: files) {
+	for (auto file : files) {
 		auto filepath = path + "/" + file.second;
 		cv::Mat image = cv::imread(filepath);
 		images_.push_back(ImagePtr(new Image(image)));
@@ -32,6 +32,13 @@ ImagePtr FsImageInput::grabImage() {
 	ImagePtr ret = images_[index_];
 	index_ = (index_ + 1) % images_.size();
 	return ret;
+}
+
+void FsImageInput::start() {
+	/* noop */
+}
+void FsImageInput::stop() {
+	/* noop */
 }
 
 } /* namespace threescanner */

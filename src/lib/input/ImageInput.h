@@ -18,6 +18,8 @@ public:
 	static ImageInputPtr create(const Config& cfg);
 	ImageInput(const Config& cfg);
 	virtual ~ImageInput();
+	virtual void start() = 0;
+	virtual void stop() = 0;
 	virtual ImagePtr grabImage() = 0;
 };
 
