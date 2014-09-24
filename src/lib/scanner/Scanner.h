@@ -14,13 +14,13 @@ namespace threescanner {
 
 class Scanner: public TcpServer {
 public:
-	Scanner(const Config& cfg, Engine* engine);
+	Scanner(const Config& cfg, EnginePtr engine);
 	virtual ~Scanner();
 	void run(const bool& continueRunning);
-private:
 	void handleAction(const std::string& action, const std::vector<std::string>& params);
 	void saveCloud(const std::string& filepath);
-	Engine* engine_;
+private:
+	EnginePtr engine_;
 	bool quit_;
 };
 

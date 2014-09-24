@@ -21,6 +21,6 @@ TEST_F(Scanner_, CanInstantiateWithoutEngine) {
 }
 
 TEST_F(Scanner_, CanInstantiateWithEngine) {
-	Engine::Ptr engine = Engine::create("threephase", cfg.getChild("engine"), nullptr);
-	ASSERT_NO_THROW(Scanner instance(cfg, engine.get()));
+	EnginePtr engine = Engine::create("threephase", cfg.getChild("engine"), nullptr);
+	ASSERT_NO_THROW(Scanner instance(cfg, engine));
 }

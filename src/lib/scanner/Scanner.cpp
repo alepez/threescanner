@@ -13,7 +13,7 @@
 
 namespace threescanner {
 
-Scanner::Scanner(const Config& cfg, Engine* engine) :
+Scanner::Scanner(const Config& cfg, EnginePtr engine) :
 				TcpServer(cfg.getChild("net")),
 				engine_(engine),
 				quit_(false) {

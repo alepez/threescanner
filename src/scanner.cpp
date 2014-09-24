@@ -26,12 +26,8 @@ int main(int argc, char* argv[]) {
 	std::string confChildname = argc > 3 ? argv[3] : "scanner";
 	Config cfg = Config(confFilepath).getChild(confChildname);
 	ImageInput* input = nullptr;
-	Engine* engine = nullptr;
-	if (type == "threephase") {
-		engine = new ThreephaseEngine(cfg.getChild("engine"), input);
-	}
+	EnginePtr engine = Engine::create(type, cfg.getChild("engine"), input);
 	Scanner scanner(cfg, engine);
 	scanner.run(continueRunning);
-	delete engine;
 	return 0;
 }

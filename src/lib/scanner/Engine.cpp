@@ -10,17 +10,17 @@
 
 namespace threescanner {
 
-Engine::Ptr Engine::create(const std::string& type, const Config& cfg, ImageInput* input) {
+EnginePtr Engine::create(const std::string& type, const Config& cfg, ImageInput* input) {
 	if (type == "threephase") {
-		return Engine::Ptr(new ThreephaseEngine(cfg, input));
+		return EnginePtr(new ThreephaseEngine(cfg, input));
 	}
 	throw std::invalid_argument("Cannot intantiate Engine of type " + type);
 }
 
-Engine::Ptr Engine::create(const Config& cfg, ImageInput* input) {
+EnginePtr Engine::create(const Config& cfg, ImageInput* input) {
 	const std::string& type = cfg.get<std::string>("type");
 	if (type == "threephase") {
-		return Engine::Ptr(new ThreephaseEngine(cfg, input));
+		return EnginePtr(new ThreephaseEngine(cfg, input));
 	}
 	throw std::invalid_argument("Cannot intantiate Engine of type " + type);
 }
