@@ -8,6 +8,7 @@ DIST_DIR := dist
 THIRD_PARTY_LIB_DIR := third_party/lib
 THIRD_PARTY_INCLUDE_DIR := third_party/include
 THIRD_PARTY_TMP_DIR := third_party/tmp
+TMP_DIR := tmp
 
 ## SOURCES
 CXX_SRC := $(shell find $(LIB_SRC_DIR) -name "*.cpp")
@@ -156,5 +157,9 @@ clean:
 
 ## clean everything
 distclean: clean
-	rm -rf $(DIST_DIR) $(BUILD_DIR)
+	rm -rf $(DIST_DIR)/* $(BUILD_DIR)/* $(TMP_DIR)/*
 	rm -rf $(THIRD_PARTY_INCLUDE_DIR) $(THIRD_PARTY_LIB_DIR) $(THIRD_PARTY_TMP_DIR)
+
+## mount tmpfs to build, dist and tmp
+mount_tmpfs:
+	for i in build tmp dist; do mkdir -p $$i; sudo mount -t tmpfs tmpfs $$i; done
