@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 
 #include <common/Config.h>
-#include <engine/threephase/ThreephaseEngine.h>
+#include <scanner/threephase/ThreephaseEngine.h>
 
 #include <format.h>
 #include <opencv2/highgui/highgui.hpp>

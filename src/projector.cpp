@@ -1,5 +1,5 @@
-#include "lib/projector/threephase/ThreephaseProjector.h"
-#include "lib/common/Config.h"
+#include <projector/threephase/ThreephaseProjector.h>
+#include <common/Config.h>
 
 #include <string>
 

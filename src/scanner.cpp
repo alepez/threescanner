@@ -1,6 +1,6 @@
-#include "lib/engine/Scanner.h"
-#include "lib/engine/threephase/ThreephaseEngine.h"
-#include "lib/common/Config.h"
+#include <scanner/Scanner.h>
+#include <scanner/threephase/ThreephaseEngine.h>
+#include <common/Config.h>
 
 #include <string>
 #include <signal.h>
