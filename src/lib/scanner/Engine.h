@@ -13,6 +13,7 @@
 #include <opencv2/core/core.hpp>
 #include <string>
 #include <memory>
+#include <future>
 
 namespace threescanner {
 
@@ -21,7 +22,7 @@ public:
 	static EnginePtr create(const std::string& type, const Config& cfg);
 	static EnginePtr create(const Config& cfg);
 	virtual ~Engine();
-	virtual void scan() = 0;
+	virtual std::future<void> scan() = 0;
 	virtual void setParameter(const std::string& key, const std::string& value) = 0;
 	virtual void setImage(const std::string& id, const cv::Mat& image) = 0;
 	PointCloud::ConstPtr getCloud() const;

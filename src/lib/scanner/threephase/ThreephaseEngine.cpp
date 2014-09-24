@@ -98,13 +98,15 @@ ThreephaseEngine::~ThreephaseEngine() {
 
 }
 
-void ThreephaseEngine::scan() {
-	/* TODO:
-	 * should tell to projector to project the pattern
-	 * should get images from ImageInput (Camera)
-	 */
-	std::string orientation = "h"; /* TODO: from Config */
-	this->process(orientation);
+std::future<void> ThreephaseEngine::scan() {
+	return std::async(std::launch::async, [this]() {
+		/* TODO:
+		 * should tell to projector to project the pattern
+		 * should get images from ImageInput (Camera)
+		 */
+		std::string orientation = "h"; /* TODO: from Config */
+		this->process(orientation);
+	});
 }
 
 void ThreephaseEngine::setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image) {

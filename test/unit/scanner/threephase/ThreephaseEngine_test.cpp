@@ -59,5 +59,5 @@ TEST_F(ThreephaseEngine_, CanAttachInput) {
 
 TEST_F(ThreephaseEngine_, CanScan) {
 	engine.setInput(ImageInput::create(Config("fsInput.json")));
-	ASSERT_NO_THROW(engine.scan());
+	ASSERT_NO_THROW(auto f = engine.scan(); f.wait());
 }
