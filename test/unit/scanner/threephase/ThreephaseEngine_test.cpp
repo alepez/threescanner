@@ -59,7 +59,8 @@ TEST_F(ThreephaseEngine_, CanAttachInput) {
 }
 
 TEST_F(ThreephaseEngine_, CanScan) {
-	engine.connectProjector(Projector::create(Config("projector.json")));
+	ProjectorPtr projector = Projector::create(Config("projector.json"));
+	engine.connectProjector(projector);
 	engine.setInput(ImageInput::create(Config("fsInput.json")));
 	ASSERT_NO_THROW(engine.scanSync());
 }
@@ -74,15 +75,17 @@ public:
 	Config cfg { Config(confFilepath).getChild("scanner").getChild("engine") };
 	ThreephaseEngine engine { (cfg) };
 	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
+	ProjectorPtr projector = Projector::create(Config("projector.json"));
 	void SetUp() {
+		engine.connectProjector(projector);
 		engine.setInput(input);
 		engine.scanSync();
 	}
 };
 
-//TEST_F(ThreephaseEngineAfterScanning, CanGetCloud) {
-//	static const size_t MIN_POINTS_IN_CLOUD = 1000;
-//	PointCloud::ConstPtr cloud = engine.getCloud();
-//	ASSERT_THAT(cloud->size(), Gt(MIN_POINTS_IN_CLOUD));
-//}
+TEST_F(ThreephaseEngineAfterScanning, CanGetCloud) {
+	static const size_t MIN_POINTS_IN_CLOUD = 1000;
+	PointCloud::ConstPtr cloud = engine.getCloud();
+	ASSERT_THAT(cloud->size(), Gt(MIN_POINTS_IN_CLOUD));
+}
 

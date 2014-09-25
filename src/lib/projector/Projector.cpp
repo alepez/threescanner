@@ -45,4 +45,10 @@ Projector::~Projector() {
 
 }
 
+void Projector::waitUntilReady() const {
+	while (!this->isReady()) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+}
+
 } /* namespace threescanner */

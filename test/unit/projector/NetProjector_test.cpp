@@ -18,7 +18,7 @@ public:
 };
 
 TEST_F(NetProjectorInstance, CanSendQuitAndRealProjectorActuallyQuit) {
-	static const int TIMEOUT_MS = 100;
+	static const int TIMEOUT_MS = 500;
 	auto fut = realProjector->start();
 	ASSERT_NO_THROW(projector.quit());
 	std::future_status status = fut.wait_for(std::chrono::milliseconds(TIMEOUT_MS));

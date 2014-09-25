@@ -16,6 +16,7 @@ $(UNIT_TESTS_EXE): $(UNIT_TESTS_OBJ) $(OBJS)
 	$(CXX) -o $@ -lgtest -lgmock $(LDFLAGS) $(UNIT_TESTS_OBJ) $(OBJS)
 
 unit_test: $(UNIT_TESTS_EXE)
+	@echo $(wildcard $(UNIT_TESTS_BUILD_DIR)/**/*.d)
 	cd test/mocks && ../../tmp/test/unit/test-all
 
 test: executables unit_test

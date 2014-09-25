@@ -8,6 +8,7 @@
 #include "../../common/Logger.h"
 #include "../../common/Config.h"
 #include "../../projector/Projector.h"
+#include "../../input/ImageInput.h"
 
 #include <format.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -101,7 +102,6 @@ ThreephaseEngine::~ThreephaseEngine() {
 
 void ThreephaseEngine::scanSync() {
 	/* TODO:
-	 * should tell to projector to project the pattern
 	 * should get images from ImageInput (Camera)
 	 */
 	if (projector_.get() == nullptr) {
@@ -110,12 +110,18 @@ void ThreephaseEngine::scanSync() {
 	if (input_.get() == nullptr) {
 		throw std::runtime_error("Cannot scan without a valid image input");
 	}
+	projector_->start();
+	logDebug("Wait until ready");
+	projector_->waitUntilReady();
+	logDebug("ready");
 	std::string orientation = "h"; /* TODO: from Config */
-	this->projector_->setParameter("orientation", orientation);
+	projector_->setParameter("orientation", orientation);
 	for (int phase = 1; phase <= 3; ++phase) {
 		logDebug("Scan phase %i", phase);
 		this->projector_->setParameter("phase", fmt::sprintf("%i", phase));
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		ImagePtr image = input_->grabImage();
+		this->setImage(fmt::sprintf("%s:%i", orientation, phase), *image);
 	}
 	this->process(orientation);
 }

@@ -21,6 +21,7 @@ public:
 	void quit();
 	virtual std::future<void> start();
 	virtual void stop();
+	virtual bool isReady() const;
 };
 
 } /* namespace threescanner */

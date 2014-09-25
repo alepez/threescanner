@@ -36,4 +36,8 @@ void NetProjector::stop() {
 
 }
 
+bool NetProjector::isReady() const {
+	return false; /* TODO: this is ready when connected real projector is ready */
+}
+
 } /* namespace threescanner */

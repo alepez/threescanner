@@ -28,6 +28,7 @@ public:
 	virtual std::future<void> start();
 	virtual void stop();
 	void run();
+	virtual bool isReady() const;
 protected:
 	GLuint getProgramID();
 private:
@@ -40,6 +41,7 @@ private:
 	bool closeWindow_;
 	int windowWidth_;
 	int windowHeight_;
+	bool ready_;
 };
 
 } /* namespace threescanner */

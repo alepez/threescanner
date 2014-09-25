@@ -27,7 +27,8 @@ RealProjector::RealProjector(const std::string& type, const Config& cfg) :
 				programID_(0),
 				closeWindow_(false),
 				windowWidth_(0),
-				windowHeight_(0) {
+				windowHeight_(0),
+				ready_(false) {
 
 }
 
@@ -88,6 +89,8 @@ void RealProjector::run() {
 	quad_ = new Quad();
 	programID_ = Shaders::get(engineType_);
 	glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_TRUE);
+	logDebug("Projector is ready");
+	ready_ = true;
 	do {
 		this->syncComm();
 		this->render();
@@ -135,6 +138,10 @@ std::future<void> RealProjector::start() {
 
 void RealProjector::stop() {
 	closeWindow_ = true;
+}
+
+bool RealProjector::isReady() const {
+	return ready_;
 }
 
 } /* namespace threescanner */
