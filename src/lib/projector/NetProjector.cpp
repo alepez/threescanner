@@ -11,6 +11,7 @@
 namespace threescanner {
 
 NetProjector::NetProjector(const Config& cfg) :
+				Projector("net", cfg),
 				TcpClient(cfg.getChild("net")) {
 
 }
@@ -25,6 +26,14 @@ void NetProjector::setParameter(const std::string& key, const std::string& value
 
 void NetProjector::quit() {
 	this->sendAction("quit");
+}
+
+std::future<void> NetProjector::start() {
+	return std::future<void>();
+}
+
+void NetProjector::stop() {
+
 }
 
 } /* namespace threescanner */

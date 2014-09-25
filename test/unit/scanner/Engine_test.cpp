@@ -51,7 +51,7 @@ TEST_F(EngineInstance, CanScanAsyncronously) {
 	ASSERT_THAT(status, Eq(std::future_status::ready));
 }
 
-//TEST_F(EngineInstance, CanConnectProjector) {
-//	NetProjector projector(cfg.getChild("projector"));
-//	engine->connectProjector(std::make_shared<Projector>(projector));
-//}
+TEST_F(EngineInstance, CanConnectProjector) {
+	ProjectorPtr projector = std::make_shared<NetProjector>(cfg.getChild("projector"));
+	engine->connectProjector(projector);
+}

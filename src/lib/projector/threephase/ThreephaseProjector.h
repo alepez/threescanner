@@ -15,7 +15,6 @@ class ThreephaseProjector: public RealProjector {
 public:
 	ThreephaseProjector(const Config& cfg);
 	virtual ~ThreephaseProjector();
-private:
 	virtual void setParameter(const std::string& key, const std::string& value);
 };
 

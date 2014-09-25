@@ -9,15 +9,18 @@
 
 #include "../prerequisites.h"
 #include "../net/TcpClient.h"
+#include "Projector.h"
 
 namespace threescanner {
 
-class NetProjector: public TcpClient {
+class NetProjector: public Projector, public TcpClient {
 public:
 	NetProjector(const Config&);
 	virtual ~NetProjector();
 	void setParameter(const std::string& key, const std::string& value);
 	void quit();
+	virtual std::future<void> start();
+	virtual void stop();
 };
 
 } /* namespace threescanner */

@@ -4,6 +4,7 @@
 #include <common/Config.h>
 #include <scanner/threephase/ThreephaseEngine.h>
 #include <input/ImageInput.h>
+#include <projector/Projector.h>
 
 #include <format.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -58,8 +59,13 @@ TEST_F(ThreephaseEngine_, CanAttachInput) {
 }
 
 TEST_F(ThreephaseEngine_, CanScan) {
+	engine.connectProjector(Projector::create(Config("projector.json")));
 	engine.setInput(ImageInput::create(Config("fsInput.json")));
-	ASSERT_NO_THROW(auto f = engine.scan(); f.wait());
+	ASSERT_NO_THROW(engine.scanSync());
+}
+
+TEST_F(ThreephaseEngine_, ShouldNotScanWithoutAValidInput) {
+	ASSERT_THROW(engine.scanSync(), std::runtime_error);
 }
 
 class ThreephaseEngineAfterScanning: public testing::Test {
@@ -70,8 +76,7 @@ public:
 	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
 	void SetUp() {
 		engine.setInput(input);
-		auto f = engine.scan();
-		f.wait();
+		engine.scanSync();
 	}
 };
 
