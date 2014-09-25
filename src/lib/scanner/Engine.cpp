@@ -43,4 +43,10 @@ PointCloud::ConstPtr Engine::getCloud() const {
 	return cloud_;
 }
 
+std::future<void> Engine::scan() {
+	return std::async(std::launch::async, [this]() {
+		this->scanSync();
+	});
+}
+
 } /* namespace threescanner */

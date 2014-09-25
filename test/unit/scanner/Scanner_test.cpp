@@ -27,3 +27,22 @@ TEST_F(Scanner_, CanSetEngineAfterInitialization) {
 	Scanner scanner(cfg);
 	scanner.setEngine(engine);
 }
+
+class ScannerInstance: public testing::Test {
+public:
+	Config cfg { Config("threescanner.json").getChild("scanner") };
+	EnginePtr engine { Engine::create("threephase", cfg.getChild("engine")) };
+	Scanner scanner { (cfg) };
+	void SetUp() {
+		scanner.setEngine(engine);
+	}
+};
+
+TEST_F(ScannerInstance, CanStartAndStopAfterSomeTime) {
+	auto f = scanner.start();
+	std::async(std::launch::async, [&]() {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		scanner.stop();
+	});
+	f.wait();
+}

@@ -25,9 +25,8 @@ int main(int argc, char* argv[]) {
 	std::string confFilepath = argc > 2 ? argv[2] : "threescanner.json";
 	std::string confChildname = argc > 3 ? argv[3] : "scanner";
 	Config cfg = Config(confFilepath).getChild(confChildname);
-	ImageInput* input = nullptr;
 	EnginePtr engine = Engine::create(type, cfg.getChild("engine"));
 	Scanner scanner(cfg, engine);
-	scanner.run(continueRunning);
+//	scanner.run(continueRunning);
 	return 0;
 }

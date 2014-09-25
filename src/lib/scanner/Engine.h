@@ -22,13 +22,14 @@ public:
 	static EnginePtr create(const std::string& type, const Config& cfg);
 	static EnginePtr create(const Config& cfg);
 	virtual ~Engine();
-	virtual std::future<void> scan() = 0;
+	std::future<void> scan();
 	virtual void setParameter(const std::string& key, const std::string& value) = 0;
 	virtual void setImage(const std::string& id, const cv::Mat& image) = 0;
 	PointCloud::ConstPtr getCloud() const;
 	void setInput(ImageInputPtr input);
 protected:
 	Engine(const Config&);
+	virtual void scanSync() = 0;
 	ImageInputPtr input_;
 	PointCloud::Ptr cloud_;
 };

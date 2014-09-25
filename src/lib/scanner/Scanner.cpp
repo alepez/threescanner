@@ -23,8 +23,8 @@ Scanner::~Scanner() {
 
 }
 
-void Scanner::run(const bool& continueRunning) {
-	while (continueRunning && !quit_) {
+void Scanner::run() {
+	while (!quit_) {
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 		this->syncComm();
 	}
@@ -65,6 +65,16 @@ void Scanner::saveCloud(const std::string& filepath) {
 
 void Scanner::setEngine(EnginePtr engine) {
 	engine_ = engine;
+}
+
+std::future<void> Scanner::start() {
+	return std::async(std::launch::async, [this]() {
+		this->run();
+	});
+}
+
+void Scanner::stop() {
+	quit_ = true;
 }
 
 } /* namespace threescanner */

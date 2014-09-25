@@ -138,4 +138,14 @@ GLuint Projector::getProgramID() {
 	return programID_;
 }
 
+std::future<void> Projector::start() {
+	return std::async(std::launch::async, [this]() {
+		this->run();
+	});
+}
+
+void Projector::stop() {
+	closeWindow_ = true;
+}
+
 } /* namespace threescanner */

@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 	Config cfg = Config(confFilepath).getChild(confChildname);
 	if (type == "threephase") {
 		ThreephaseProjector prj(cfg);
-		prj.run();
+//		prj.run();
 		return 0;
 	}
 	return 0;
