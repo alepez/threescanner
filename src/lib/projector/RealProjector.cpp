@@ -21,25 +21,19 @@ static GLFWmonitor* selectMonitor(const std::string& name);
 RealProjector::RealProjector(const std::string& type, const Config& cfg) :
 				Projector(type, cfg),
 				TcpServer(cfg.getChild("net")),
+				cfg_(new Config(cfg)),
 				window_(nullptr),
 				quad_(nullptr),
 				programID_(0),
 				closeWindow_(false),
 				windowWidth_(0),
 				windowHeight_(0) {
-	if (!glfwInit()) {
-		throw std::runtime_error("Failed to initialize GLFW");
-	}
-	this->setupWindow(cfg.getChild("window"));
-	quad_ = new Quad();
-	programID_ = Shaders::get(engineType_);
+
 }
 
 RealProjector::~RealProjector() {
 	this->stop();
-	Shaders::destroy(programID_);
-	glfwTerminate();
-	delete quad_;
+	delete cfg_;
 }
 
 void RealProjector::handleAction(const std::string& action, const std::vector<std::string>& params) {
@@ -87,11 +81,21 @@ void RealProjector::setupWindow(const Config& cfg) {
 }
 
 void RealProjector::run() {
+	if (!glfwInit()) {
+		throw std::runtime_error("Failed to initialize GLFW");
+	}
+	this->setupWindow(cfg_->getChild("window"));
+	quad_ = new Quad();
+	programID_ = Shaders::get(engineType_);
 	glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_TRUE);
 	do {
 		this->syncComm();
 		this->render();
 	} while ((glfwGetKey(window_, GLFW_KEY_ESCAPE) != GLFW_PRESS) && (!glfwWindowShouldClose(window_)) && !closeWindow_);
+
+	Shaders::destroy(programID_);
+	glfwTerminate();
+	delete quad_;
 }
 
 void RealProjector::render() {

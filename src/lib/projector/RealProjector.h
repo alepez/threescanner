@@ -27,12 +27,13 @@ public:
 	virtual void handleAction(const std::string& action, const std::vector<std::string>& params = std::vector<std::string>());
 	virtual std::future<void> start();
 	virtual void stop();
+	void run();
 protected:
 	GLuint getProgramID();
 private:
-	void run();
 	void setupWindow(const Config& cfg);
 	void render();
+	const Config* cfg_;
 	GLFWwindow* window_;
 	Quad* quad_;
 	GLuint programID_;

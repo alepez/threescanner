@@ -22,7 +22,7 @@ ImageInputPtr ImageInput::create(const Config& cfg) {
 	return ImageInput::create(type, cfg);
 }
 
-ImageInput::ImageInput(const Config& cfg) {
+ImageInput::ImageInput(const Config&) {
 
 }
 
