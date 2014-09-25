@@ -7,19 +7,9 @@
 
 using namespace threescanner;
 
-static bool continueRunning = true;
+static Scanner* scanner_g = 0;
 
 int main(int argc, char* argv[]) {
-	/* attach signal */
-	signal(SIGINT, [](int) {
-		continueRunning = false;
-	});
-	signal(SIGQUIT, [](int) {
-		continueRunning = false;
-	});
-	signal(SIGTERM, [](int) {
-		continueRunning = false;
-	});
 	/* configure */
 	std::string type = argc > 1 ? argv[1] : "threephase";
 	std::string confFilepath = argc > 2 ? argv[2] : "threescanner.json";
@@ -27,6 +17,18 @@ int main(int argc, char* argv[]) {
 	Config cfg = Config(confFilepath).getChild(confChildname);
 	EnginePtr engine = Engine::create(type, cfg.getChild("engine"));
 	Scanner scanner(cfg, engine);
-//	scanner.run(continueRunning);
+	scanner_g = &scanner;
+	/* attach signal */
+	signal(SIGINT, [](int) {
+		scanner_g->stop();
+	});
+	signal(SIGQUIT, [](int) {
+		scanner_g->stop();
+	});
+	signal(SIGTERM, [](int) {
+		scanner_g->stop();
+	});
+	auto fut = scanner.start();
+	fut.wait();
 	return 0;
 }
