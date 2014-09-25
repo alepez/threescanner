@@ -1,0 +1,5 @@
+{
+  "type": "fs",
+  "path": "./",
+  "files": ["phase1.png", "phase2.png", "phase3.png"]
+}

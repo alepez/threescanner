@@ -1,0 +1,15 @@
+{
+  "type": "threephase",
+  "window": {
+    "name": "threescanner",
+    "width": "1024",
+    "height": "768",
+    "monitor": "none"
+  },
+  "net": {
+    "name": "Projector",
+    "host": "127.0.0.1",
+    "port": 11602,
+    "ignoreErrors": true
+  }
+}

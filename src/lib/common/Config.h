@@ -34,6 +34,9 @@ public:
 		return ret;
 	}
 	Config getChild(const std::string& path) const;
+	template<typename T> void set(const std::string& path, const T& value) {
+		pt_.put(path.c_str(), value);
+	}
 private:
 	Config(const boost::property_tree::ptree& pt);
 	boost::property_tree::ptree pt_;

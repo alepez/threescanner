@@ -13,7 +13,7 @@
 
 namespace threescanner {
 
-Scanner::Scanner(const Config& cfg, Engine* engine) :
+Scanner::Scanner(const Config& cfg, EnginePtr engine) :
 				TcpServer(cfg.getChild("net")),
 				engine_(engine),
 				quit_(false) {
@@ -23,8 +23,8 @@ Scanner::~Scanner() {
 
 }
 
-void Scanner::run(const bool& continueRunning) {
-	while (continueRunning && !quit_) {
+void Scanner::run() {
+	while (!quit_) {
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 		this->syncComm();
 	}
@@ -39,7 +39,7 @@ void Scanner::handleAction(const std::string& action, const std::vector<std::str
 		return;
 	}
 	if (action == "scan") {
-		engine_->startScan();
+		engine_->scan();
 		return;
 	}
 	if (action == "save") {
@@ -61,6 +61,20 @@ void Scanner::saveCloud(const std::string& filepath) {
 	} catch (const std::exception& e) {
 		logError("Cannot save PointCloud to " + filepath + ": " + e.what());
 	}
+}
+
+void Scanner::setEngine(EnginePtr engine) {
+	engine_ = engine;
+}
+
+std::future<void> Scanner::start() {
+	return std::async(std::launch::async, [this]() {
+		this->run();
+	});
+}
+
+void Scanner::stop() {
+	quit_ = true;
 }
 
 } /* namespace threescanner */

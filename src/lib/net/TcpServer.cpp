@@ -28,7 +28,7 @@ TcpServer::TcpServer(const Config& cfg) :
 				ioService_(),
 				acceptor_(ioService_, tcp::endpoint(tcp::v4(), cfg.get<int>("port"))),
 				continueRunning_(true) {
-	thread_ = new boost::thread(boost::bind(&TcpServer::run, this));
+	thread_ = new boost::thread(boost::bind(&TcpServer::runTcpServer, this));
 }
 
 TcpServer::~TcpServer() {
@@ -46,7 +46,7 @@ void TcpServer::listen() {
 	});
 }
 
-void TcpServer::run() {
+void TcpServer::runTcpServer() {
 	this->listen();
 	while (continueRunning_) {
 		/* poll invece di run evita che si blocchi qui, cosi` posso

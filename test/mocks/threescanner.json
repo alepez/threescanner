@@ -9,7 +9,18 @@
         "znoise": 0.72,
         "zblur": 16,
         "cloudScale": 1
+      },
+      "projector": {
+        "net": {
+          "name": "Projector",
+          "host": "127.0.0.1",
+          "port": 11602,
+          "ignoreErrors": true
+        }
       }
+    },
+    "input": {
+    	
     },
     "net": {
       "name": "Scanner",

@@ -2,7 +2,9 @@
 #include <gmock/gmock.h>
 
 #include <common/Config.h>
-#include <engine/threephase/ThreephaseEngine.h>
+#include <scanner/threephase/ThreephaseEngine.h>
+#include <input/ImageInput.h>
+#include <projector/Projector.h>
 
 #include <format.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -44,7 +46,6 @@ TEST_F(ThreephaseEngine_, CanSetParameters) {
 	ASSERT_NO_THROW(engine.setParameter("tuning:zblur", tuningCfg.get<std::string>("zblur")));
 }
 
-
 TEST_F(ThreephaseEngine_, CannotSetInvalidParameters) {
 	Config tuningCfg = cfg.getChild("tuning");
 	ASSERT_THROW(engine.setParameter("mscale", tuningCfg.get<std::string>("mscale")), std::invalid_argument);
@@ -52,3 +53,39 @@ TEST_F(ThreephaseEngine_, CannotSetInvalidParameters) {
 	ASSERT_THROW(engine.setParameter("tuni**skew", tuningCfg.get<std::string>("zskew")), std::invalid_argument);
 	ASSERT_THROW(engine.setParameter("tuningd:cloudScale", tuningCfg.get<std::string>("cloudScale")), std::invalid_argument);
 }
+
+TEST_F(ThreephaseEngine_, CanAttachInput) {
+	ASSERT_NO_THROW(engine.setInput(ImageInput::create(Config("fsInput.json"))));
+}
+
+TEST_F(ThreephaseEngine_, CanScan) {
+	ProjectorPtr projector = Projector::create(Config("projector.json"));
+	engine.connectProjector(projector);
+	engine.setInput(ImageInput::create(Config("fsInput.json")));
+	ASSERT_NO_THROW(engine.scanSync());
+}
+
+TEST_F(ThreephaseEngine_, ShouldNotScanWithoutAValidInput) {
+	ASSERT_THROW(engine.scanSync(), std::runtime_error);
+}
+
+class ThreephaseEngineAfterScanning: public testing::Test {
+public:
+	std::string confFilepath { "threescanner.json" };
+	Config cfg { Config(confFilepath).getChild("scanner").getChild("engine") };
+	ThreephaseEngine engine { (cfg) };
+	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
+	ProjectorPtr projector = Projector::create(Config("projector.json"));
+	void SetUp() {
+		engine.connectProjector(projector);
+		engine.setInput(input);
+		engine.scanSync();
+	}
+};
+
+TEST_F(ThreephaseEngineAfterScanning, CanGetCloud) {
+	static const size_t MIN_POINTS_IN_CLOUD = 1000;
+	PointCloud::ConstPtr cloud = engine.getCloud();
+	ASSERT_THAT(cloud->size(), Gt(MIN_POINTS_IN_CLOUD));
+}
+

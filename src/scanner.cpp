@@ -1,37 +1,34 @@
-#include "lib/engine/Scanner.h"
-#include "lib/engine/threephase/ThreephaseEngine.h"
-#include "lib/common/Config.h"
+#include <scanner/Scanner.h>
+#include <scanner/threephase/ThreephaseEngine.h>
+#include <common/Config.h>
 
 #include <string>
 #include <signal.h>
 
 using namespace threescanner;
 
-static bool continueRunning = true;
+static Scanner* scanner_g = 0;
 
 int main(int argc, char* argv[]) {
-	/* attach signal */
-	signal(SIGINT, [](int) {
-		continueRunning = false;
-	});
-	signal(SIGQUIT, [](int) {
-		continueRunning = false;
-	});
-	signal(SIGTERM, [](int) {
-		continueRunning = false;
-	});
 	/* configure */
 	std::string type = argc > 1 ? argv[1] : "threephase";
 	std::string confFilepath = argc > 2 ? argv[2] : "threescanner.json";
 	std::string confChildname = argc > 3 ? argv[3] : "scanner";
 	Config cfg = Config(confFilepath).getChild(confChildname);
-	ImageInput* input = nullptr;
-	Engine* engine = nullptr;
-	if (type == "threephase") {
-		engine = new ThreephaseEngine(cfg.getChild("engine"), input);
-	}
+	EnginePtr engine = Engine::create(type, cfg.getChild("engine"));
 	Scanner scanner(cfg, engine);
-	scanner.run(continueRunning);
-	delete engine;
+	scanner_g = &scanner;
+	/* attach signal */
+	signal(SIGINT, [](int) {
+		scanner_g->stop();
+	});
+	signal(SIGQUIT, [](int) {
+		scanner_g->stop();
+	});
+	signal(SIGTERM, [](int) {
+		scanner_g->stop();
+	});
+	auto fut = scanner.start();
+	fut.wait();
 	return 0;
 }

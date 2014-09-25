@@ -12,7 +12,7 @@
 namespace threescanner {
 
 ThreephaseProjector::ThreephaseProjector(const Config& cfg) :
-				Projector("threephase", cfg) {
+				RealProjector("threephase", cfg) {
 
 }
 
@@ -20,15 +20,19 @@ ThreephaseProjector::~ThreephaseProjector() {
 
 }
 
-void ThreephaseProjector::setParameters(const std::string& key, const std::string& value) {
+void ThreephaseProjector::setParameter(const std::string& key, const std::string& value) {
 	static const int VERTICAL = 1;
 	static const int HORIZONTAL = 0;
 	const GLuint programID = this->getProgramID();
 	if (key == "orientation") {
 		if (value[0] == 'V' || value[0] == 'v') {
-			glUniform1i(glGetUniformLocation(programID, "orientation"), VERTICAL);
+			logDebug("Change orientation to VERTICAL");
+			/* TODO: glUniform1i must be called in graphic thread */
+//			glUniform1i(glGetUniformLocation(programID, "orientation"), VERTICAL);
 		} else if (value[0] == 'H' || value[0] == 'h') {
-			glUniform1i(glGetUniformLocation(programID, "orientation"), HORIZONTAL);
+			logDebug("Change orientation to HORIZONTAL");
+			/* TODO: glUniform1i must be called in graphic thread */
+//			glUniform1i(glGetUniformLocation(programID, "orientation"), HORIZONTAL);
 		} else {
 			logError("Invalid orientation: " + value);
 			/* do not throw exception */
@@ -37,7 +41,9 @@ void ThreephaseProjector::setParameters(const std::string& key, const std::strin
 		return;
 	}
 	if (key == "phase") {
-		glUniform1f(glGetUniformLocation(programID, "phase"), boost::lexical_cast<float>(value));
+		logDebug("Change phase to " + value);
+		/* TODO: glUniform1i must be called in graphic thread */
+//		glUniform1f(glGetUniformLocation(programID, "phase"), boost::lexical_cast<float>(value));
 		return;
 	}
 }

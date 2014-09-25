@@ -7,6 +7,8 @@
 #include "ThreephaseEngine.h"
 #include "../../common/Logger.h"
 #include "../../common/Config.h"
+#include "../../projector/Projector.h"
+#include "../../input/ImageInput.h"
 
 #include <format.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -70,8 +72,8 @@ void traceMatrix(const std::string& name, const glm::mat4& mat) {
 
 } /* namespace anonymous */
 
-ThreephaseEngine::ThreephaseEngine(const Config& cfg, ImageInput* input) :
-				Engine(cfg, input),
+ThreephaseEngine::ThreephaseEngine(const Config& cfg) :
+				Engine(cfg),
 				wrapMethod_(cfg.get<int>("wrapMethod")),
 				options_(),
 				toProcess_(),
@@ -98,22 +100,29 @@ ThreephaseEngine::~ThreephaseEngine() {
 
 }
 
-void ThreephaseEngine::startScan() {
-	/* TODO: should get images from ImageInput (Camera)
-	 * not from filesystem
+void ThreephaseEngine::scanSync() {
+	/* TODO:
+	 * should get images from ImageInput (Camera)
 	 */
-	static const std::string filePathPattern = "phase%u.png";
-	for (size_t phase = 0; phase < 3; ++phase) {
-		auto filepath = fmt::sprintf(filePathPattern, phase + 1);
-		cv::Mat image = cv::imread(filepath);
-		if (image.rows) {
-			logInfo("Loaded test image for phase %i from %s %i", phase + 1, filepath.c_str(), hImages_[phase].flags);
-			auto imageId = fmt::sprintf("h:%u", phase + 1);
-			this->setImage(imageId, image);
-		}
+	if (projector_.get() == nullptr) {
+		throw std::runtime_error("Cannot scan without a valid projector");
 	}
-	/* --- */
+	if (input_.get() == nullptr) {
+		throw std::runtime_error("Cannot scan without a valid image input");
+	}
+	projector_->start();
+	logDebug("Wait until ready");
+	projector_->waitUntilReady();
+	logDebug("ready");
 	std::string orientation = "h"; /* TODO: from Config */
+	projector_->setParameter("orientation", orientation);
+	for (int phase = 1; phase <= 3; ++phase) {
+		logDebug("Scan phase %i", phase);
+		this->projector_->setParameter("phase", fmt::sprintf("%i", phase));
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		ImagePtr image = input_->grabImage();
+		this->setImage(fmt::sprintf("%s:%i", orientation, phase), *image);
+	}
 	this->process(orientation);
 }
 

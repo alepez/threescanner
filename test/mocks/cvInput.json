@@ -1,0 +1,23 @@
+{
+  "device": 0,
+  "width": 1024,
+  "height": 768,
+  "format": "mjpeg",
+  "visible": true,
+  "options": {
+    "brightness": 0,
+    "contrast": 10,
+    "saturation": 0,
+    "hue": 0,
+    "gamma": 100,
+    "power_line_frequency": 0,
+    "sharpness": 0,
+    "backlight_compensation": 0,
+    "exposure_auto": 1,
+    "exposure_absolute": 42,
+    "exposure_auto_priority": 1,
+    "pan_absolute": 0,
+    "tilt_absolute": 0,
+    "zoom_absolute": 1
+  }
+}

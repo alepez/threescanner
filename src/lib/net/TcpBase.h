@@ -22,8 +22,8 @@ public:
 	virtual ~TcpBase();
 	void sendAction(const std::string& action, const std::vector<std::string>& params);
 	void sendAction(const std::string& action);
+	virtual void handleAction(const std::string& action, const std::vector<std::string>& params = std::vector<std::string>());
 protected:
-	virtual void handleAction(const std::string& action, const std::vector<std::string>& params);
 	void syncComm();
 	bool getNextMessage(std::string*);
 	void sendMessage(const std::string&);
