@@ -7,9 +7,11 @@
 #include "Projector.h"
 #include "../common/Config.h"
 #include "../common/Logger.h"
-#include "threephase/ThreephaseProjector.h"
 #include "Quad.h"
 #include "Shaders.h"
+
+#include "threephase/ThreephaseProjector.h"
+#include "NetProjector.h"
 
 #include <GLFW/glfw3.h>
 #include <boost/algorithm/string.hpp>
@@ -17,9 +19,15 @@
 namespace threescanner {
 
 ProjectorPtr Projector::create(const std::string& type, const Config& cfg) {
+	if (type == "net") {
+		return ProjectorPtr(new NetProjector(cfg));
+	}
 	if (type == "threephase") {
 		return ProjectorPtr(new ThreephaseProjector(cfg));
 	}
+	/*
+	 * ADD HERE OTHER IMPLEMENTATIONS
+	 */
 	throw std::invalid_argument("Cannot intantiate Projector of type " + type);
 }
 
@@ -28,7 +36,7 @@ ProjectorPtr Projector::create(const Config& cfg) {
 	return Projector::create(type, cfg);
 }
 
-Projector::Projector(const std::string& type, const Config& cfg) :
+Projector::Projector(const std::string& type, const Config&) :
 				engineType_(type) {
 
 }
