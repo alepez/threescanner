@@ -34,7 +34,7 @@ TcpClient::TcpClient(const Config& cfg) :
 		auto hostname = cfg.get<std::string>("host");
 		auto port = cfg.get<int>("port");
 		logDebug("Connecting to %s:%i (%s)", hostname.c_str(), port, name_.c_str());
-		endpoint_ = boost::asio::ip::tcp::endpoint(asio::ip::address::from_string(hostname), port);
+		endpoint_ = tcp::endpoint(asio::ip::address::from_string(hostname), port);
 	} catch (const std::exception& e) {
 		throw runtime_error(string("Cannot initialize TcpClient: ") + e.what());
 	}

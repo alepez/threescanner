@@ -20,7 +20,7 @@ ThreephaseProjector::~ThreephaseProjector() {
 
 }
 
-void ThreephaseProjector::setParameters(const std::string& key, const std::string& value) {
+void ThreephaseProjector::setParameter(const std::string& key, const std::string& value) {
 	static const int VERTICAL = 1;
 	static const int HORIZONTAL = 0;
 	const GLuint programID = this->getProgramID();

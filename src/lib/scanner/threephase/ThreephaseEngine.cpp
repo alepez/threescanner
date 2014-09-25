@@ -104,6 +104,7 @@ void ThreephaseEngine::scanSync() {
 	 * should get images from ImageInput (Camera)
 	 */
 	std::string orientation = "h"; /* TODO: from Config */
+//	this->projector()->setParameters();
 	this->process(orientation);
 }
 

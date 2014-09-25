@@ -61,3 +61,23 @@ TEST_F(ThreephaseEngine_, CanScan) {
 	engine.setInput(ImageInput::create(Config("fsInput.json")));
 	ASSERT_NO_THROW(auto f = engine.scan(); f.wait());
 }
+
+class ThreephaseEngineAfterScanning: public testing::Test {
+public:
+	std::string confFilepath { "threescanner.json" };
+	Config cfg { Config(confFilepath).getChild("scanner").getChild("engine") };
+	ThreephaseEngine engine { (cfg) };
+	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
+	void SetUp() {
+		engine.setInput(input);
+		auto f = engine.scan();
+		f.wait();
+	}
+};
+
+//TEST_F(ThreephaseEngineAfterScanning, CanGetCloud) {
+//	static const size_t MIN_POINTS_IN_CLOUD = 1000;
+//	PointCloud::ConstPtr cloud = engine.getCloud();
+//	ASSERT_THAT(cloud->size(), Gt(MIN_POINTS_IN_CLOUD));
+//}
+

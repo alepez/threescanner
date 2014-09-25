@@ -24,7 +24,7 @@ public:
 	static ProjectorPtr create(const std::string& type, const Config& cfg);
 	static ProjectorPtr create(const Config& cfg);
 	virtual void handleAction(const std::string& action, const std::vector<std::string>& params = std::vector<std::string>());
-	virtual void setParameters(const std::string& key, const std::string& value);
+	virtual void setParameter(const std::string& key, const std::string& value);
 	std::future<void> start();
 	void stop();
 protected:

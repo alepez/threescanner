@@ -48,6 +48,7 @@ Projector::Projector(const std::string& type, const Config& cfg) :
 }
 
 Projector::~Projector() {
+	this->stop();
 	Shaders::destroy(programID_);
 	glfwTerminate();
 	delete quad_;
@@ -109,13 +110,13 @@ void Projector::handleAction(const std::string& action, const std::vector<std::s
 		return;
 	}
 	if ((action == "set") && params.size() == 2) {
-		this->setParameters(params[0], params[1]);
+		this->setParameter(params[0], params[1]);
 		return;
 	}
 	throw std::invalid_argument("Projector: unknown action: " + action);
 }
 
-void Projector::setParameters(const std::string&, const std::string&) {
+void Projector::setParameter(const std::string&, const std::string&) {
 	/* must be reimplemented */
 }
 
