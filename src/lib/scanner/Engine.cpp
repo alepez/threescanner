@@ -49,4 +49,8 @@ std::future<void> Engine::scan() {
 	});
 }
 
+void Engine::connectProjector(ProjectorPtr projector) {
+	projector_ = projector;
+}
+
 } /* namespace threescanner */

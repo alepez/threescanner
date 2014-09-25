@@ -151,7 +151,7 @@ doc:
 
 ## clean libraries and executables
 clean:
-	rm -f $(OBJS) $(CXX_DEPS)  $(EXECUTABLES_OBJS)
+	rm -f $(OBJS) $(CXX_DEPS)  $(EXECUTABLES_OBJS) $(UNIT_TESTS_OBJ)
 	rm -f $(LIB_SHARED) $(LIB_STATIC) $(EXECUTABLES_DIST)
 	rm -f $(wildcard test/mocks/output-*.pcd)
 

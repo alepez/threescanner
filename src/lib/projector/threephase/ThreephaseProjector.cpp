@@ -12,7 +12,7 @@
 namespace threescanner {
 
 ThreephaseProjector::ThreephaseProjector(const Config& cfg) :
-				Projector("threephase", cfg) {
+				RealProjector("threephase", cfg) {
 
 }
 

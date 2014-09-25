@@ -4,6 +4,7 @@
 #include <common/Config.h>
 #include <scanner/Engine.h>
 #include <input/ImageInput.h>
+#include <projector/NetProjector.h>
 
 using namespace ::threescanner;
 using namespace ::testing;
@@ -43,7 +44,14 @@ TEST_F(EngineInstance, CannotSetInputIfAlreadyPresent) {
 }
 
 TEST_F(EngineInstance, CanScanAsyncronously) {
+	static const int TIMEOUT_MS = 1000;
 	engine->setInput(input);
-	auto f = engine->scan();
-	f.wait();
+	auto fut = engine->scan();
+	std::future_status status = fut.wait_for(std::chrono::milliseconds(TIMEOUT_MS));
+	ASSERT_THAT(status, Eq(std::future_status::ready));
 }
+
+//TEST_F(EngineInstance, CanConnectProjector) {
+//	NetProjector projector(cfg.getChild("projector"));
+//	engine->connectProjector(std::make_shared<Projector>(projector));
+//}

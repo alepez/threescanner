@@ -27,11 +27,13 @@ public:
 	virtual void setImage(const std::string& id, const cv::Mat& image) = 0;
 	PointCloud::ConstPtr getCloud() const;
 	void setInput(ImageInputPtr input);
+	void connectProjector(ProjectorPtr);
 protected:
 	Engine(const Config&);
 	virtual void scanSync() = 0;
 	ImageInputPtr input_;
 	PointCloud::Ptr cloud_;
+	ProjectorPtr projector_;
 };
 
 } /* namespace threescanner */

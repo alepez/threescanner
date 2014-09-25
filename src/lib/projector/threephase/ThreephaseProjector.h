@@ -7,11 +7,11 @@
 #ifndef threescanner_THREEPHASEPROJECTOR_H_
 #define threescanner_THREEPHASEPROJECTOR_H_
 
-#include "../Projector.h"
+#include "../RealProjector.h"
 
 namespace threescanner {
 
-class ThreephaseProjector: public Projector {
+class ThreephaseProjector: public RealProjector {
 public:
 	ThreephaseProjector(const Config& cfg);
 	virtual ~ThreephaseProjector();

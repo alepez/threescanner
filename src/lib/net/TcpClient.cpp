@@ -38,7 +38,7 @@ TcpClient::TcpClient(const Config& cfg) :
 	} catch (const std::exception& e) {
 		throw runtime_error(string("Cannot initialize TcpClient: ") + e.what());
 	}
-	thread_ = new boost::thread(boost::bind(&TcpClient::run, this));
+	thread_ = new boost::thread(boost::bind(&TcpClient::runTcpClient, this));
 }
 
 TcpClient::~TcpClient() {
@@ -47,7 +47,7 @@ TcpClient::~TcpClient() {
 	delete thread_;
 }
 
-void TcpClient::run() {
+void TcpClient::runTcpClient() {
 	logTrace(name_ + " TcpClient start");
 	while (continueRunning_) {
 		try {

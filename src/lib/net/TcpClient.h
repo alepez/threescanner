@@ -21,7 +21,7 @@ public:
 	TcpClient(const Config& cfg);
 	virtual ~TcpClient();
 private:
-	void run();
+	void runTcpClient();
 	/* rete */
 	boost::asio::ip::tcp::endpoint endpoint_;
 	/* thread */

@@ -22,7 +22,7 @@ public:
 	virtual ~TcpServer();
 private:
 	typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
-	void run();
+	void runTcpServer();
 	void session(socket_ptr sock);
 	void listen();
 	boost::asio::io_service ioService_;
