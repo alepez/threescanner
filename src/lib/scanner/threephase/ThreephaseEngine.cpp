@@ -110,7 +110,6 @@ void ThreephaseEngine::scanSync() {
 	if (input_.get() == nullptr) {
 		throw std::runtime_error("Cannot scan without a valid image input");
 	}
-	projector_->start();
 	logDebug("Wait until ready");
 	projector_->waitUntilReady();
 	logDebug("ready");

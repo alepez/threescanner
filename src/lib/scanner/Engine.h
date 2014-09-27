@@ -32,6 +32,8 @@ protected:
 	ImageInputPtr input_;
 	PointCloud::Ptr cloud_;
 	ProjectorPtr projector_;
+private:
+	std::future<void> projectorFuture_;
 };
 
 } /* namespace threescanner */

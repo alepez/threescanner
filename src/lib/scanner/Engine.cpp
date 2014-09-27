@@ -5,6 +5,7 @@
  */
 
 #include "Engine.h"
+#include "../projector/Projector.h"
 
 namespace threescanner {
 
@@ -15,7 +16,9 @@ Engine::Engine(const Config&) :
 }
 
 Engine::~Engine() {
-
+	if (projector_ != nullptr && projectorFuture_.valid()) {
+		projector_->stop();
+	}
 }
 
 void Engine::setInput(ImageInputPtr input) {
@@ -37,6 +40,7 @@ std::future<void> Engine::scan() {
 
 void Engine::connectProjector(ProjectorPtr projector) {
 	projector_ = projector;
+	projectorFuture_ = projector_->start();
 }
 
 } /* namespace threescanner */
