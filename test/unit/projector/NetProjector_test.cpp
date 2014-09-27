@@ -4,7 +4,7 @@
 #include <common/Config.h>
 #include <common/Logger.h>
 #include <projector/NetProjector.h>
-#include <projector/Projector.h>
+#include <projector/ProjectorFactory.h>
 #include <future>
 
 using namespace ::threescanner;
@@ -13,7 +13,7 @@ using namespace ::testing;
 class NetProjectorInstance: public testing::Test {
 public:
 	Config cfg { Config("projector.json") };
-	ProjectorPtr realProjector { Projector::create(cfg) };
+	ProjectorPtr realProjector { ProjectorFactory::create(cfg) };
 	NetProjector projector { cfg };
 };
 

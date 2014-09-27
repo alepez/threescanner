@@ -4,6 +4,7 @@
 #include <common/Config.h>
 #include <scanner/threephase/ThreephaseEngine.h>
 #include <input/ImageInput.h>
+#include <projector/ProjectorFactory.h>
 #include <projector/Projector.h>
 
 #include <format.h>
@@ -59,7 +60,7 @@ TEST_F(ThreephaseEngine_, CanAttachInput) {
 }
 
 TEST_F(ThreephaseEngine_, CanScan) {
-	ProjectorPtr projector = Projector::create(Config("projector.json"));
+	ProjectorPtr projector = ProjectorFactory::create(Config("projector.json"));
 	engine.connectProjector(projector);
 	engine.setInput(ImageInput::create(Config("fsInput.json")));
 	ASSERT_NO_THROW(engine.scanSync());
@@ -75,7 +76,7 @@ public:
 	Config cfg { Config(confFilepath).getChild("scanner").getChild("engine") };
 	ThreephaseEngine engine { (cfg) };
 	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
-	ProjectorPtr projector = Projector::create(Config("projector.json"));
+	ProjectorPtr projector = ProjectorFactory::create(Config("projector.json"));
 	void SetUp() {
 		engine.connectProjector(projector);
 		engine.setInput(input);

@@ -3,6 +3,7 @@
 
 #include <common/Config.h>
 #include <common/Logger.h>
+#include <projector/ProjectorFactory.h>
 #include <projector/RealProjector.h>
 #include <future>
 
@@ -12,7 +13,7 @@ using namespace ::testing;
 class RealProjectorInstance: public testing::Test {
 public:
 	Config cfg { Config("threescanner.json").getChild("projector") };
-	ProjectorPtr projector { Projector::create("threephase", cfg) };
+	ProjectorPtr projector { ProjectorFactory::create("threephase", cfg) };
 	RealProjector* realProjector { dynamic_cast<RealProjector*>(projector.get()) };
 };
 
