@@ -3,7 +3,7 @@
 
 #include <common/Config.h>
 #include <scanner/Scanner.h>
-#include <scanner/Engine.h>
+#include <scanner/EngineFactory.h>
 
 using namespace ::threescanner;
 using namespace ::testing;
@@ -18,12 +18,12 @@ TEST_F(Scanner_, CanInstantiateWithoutEngine) {
 }
 
 TEST_F(Scanner_, CanInstantiateWithEngine) {
-	EnginePtr engine = Engine::create("threephase", cfg.getChild("engine"));
+	EnginePtr engine = EngineFactory::create("threephase", cfg.getChild("engine"));
 	ASSERT_NO_THROW(Scanner instance(cfg, engine));
 }
 
 TEST_F(Scanner_, CanSetEngineAfterInitialization) {
-	EnginePtr engine = Engine::create("threephase", cfg.getChild("engine"));
+	EnginePtr engine = EngineFactory::create("threephase", cfg.getChild("engine"));
 	Scanner scanner(cfg);
 	scanner.setEngine(engine);
 }
@@ -31,7 +31,7 @@ TEST_F(Scanner_, CanSetEngineAfterInitialization) {
 class ScannerInstance: public testing::Test {
 public:
 	Config cfg { Config("threescanner.json").getChild("scanner") };
-	EnginePtr engine { Engine::create("threephase", cfg.getChild("engine")) };
+	EnginePtr engine { EngineFactory::create("threephase", cfg.getChild("engine")) };
 	Scanner scanner { (cfg) };
 	void SetUp() {
 		scanner.setEngine(engine);

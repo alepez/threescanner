@@ -20,9 +20,9 @@ class ThreephaseEngine: public Engine {
 public:
 	ThreephaseEngine(const Config& cfg);
 	virtual ~ThreephaseEngine();
-	virtual void setParameter(const std::string& key, const std::string& value);
-	virtual void setImage(const std::string& id, const cv::Mat& image);
-	void scanSync();
+	virtual void setParameter(const std::string& key, const std::string& value) override;
+	virtual void setImage(const std::string& id, const cv::Mat& image) override;
+	void scanSync() override;
 private:
 	void setImage(const std::string& orientation, const size_t& phase, const cv::Mat& image);
 	void process(const std::string& orientation = "last");

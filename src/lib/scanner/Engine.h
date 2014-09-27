@@ -19,8 +19,6 @@ namespace threescanner {
 
 class Engine {
 public:
-	static EnginePtr create(const std::string& type, const Config& cfg);
-	static EnginePtr create(const Config& cfg);
 	virtual ~Engine();
 	std::future<void> scan();
 	virtual void setParameter(const std::string& key, const std::string& value) = 0;
@@ -34,6 +32,8 @@ protected:
 	ImageInputPtr input_;
 	PointCloud::Ptr cloud_;
 	ProjectorPtr projector_;
+private:
+	std::future<void> projectorFuture_;
 };
 
 } /* namespace threescanner */

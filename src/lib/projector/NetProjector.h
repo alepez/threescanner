@@ -17,11 +17,11 @@ class NetProjector: public Projector, public TcpClient {
 public:
 	NetProjector(const Config&);
 	virtual ~NetProjector();
-	void setParameter(const std::string& key, const std::string& value);
+	void setParameter(const std::string& key, const std::string& value) override;
+	virtual std::future<void> start() override;
+	virtual void stop() override;
+	virtual bool isReady() const override;
 	void quit();
-	virtual std::future<void> start();
-	virtual void stop();
-	virtual bool isReady() const;
 };
 
 } /* namespace threescanner */
