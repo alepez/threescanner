@@ -20,7 +20,7 @@ public:
 	virtual std::future<void> start() = 0;
 	virtual void stop() = 0;
 	virtual bool isReady() const = 0;
-	virtual void waitUntilReady() const;
+	void waitUntilReady() const;
 protected:
 	Projector(const std::string& type, const Config&);
 	virtual ~Projector();
