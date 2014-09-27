@@ -14,8 +14,6 @@ namespace threescanner {
 
 class ImageInput {
 public:
-	static ImageInputPtr create(const std::string& type, const Config& cfg);
-	static ImageInputPtr create(const Config& cfg);
 	ImageInput(const Config& cfg);
 	virtual ~ImageInput();
 	virtual void start() = 0;

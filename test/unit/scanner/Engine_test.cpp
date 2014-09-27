@@ -5,6 +5,7 @@
 #include <scanner/EngineFactory.h>
 #include <scanner/Engine.h>
 #include <input/ImageInput.h>
+#include <input/ImageInputFactory.h>
 #include <projector/NetProjector.h>
 
 using namespace ::threescanner;
@@ -14,7 +15,7 @@ class AnEngine: public testing::Test {
 public:
 	Config cfg { Config("threescanner.json").getChild("scanner").getChild("engine") };
 	EnginePtr engine = EngineFactory::create("threephase", cfg);
-	ImageInputPtr input = ImageInput::create(Config("fsInput.json"));
+	ImageInputPtr input = ImageInputFactory::create(Config("fsInput.json"));
 };
 
 TEST_F(AnEngine, CanSetInput) {
