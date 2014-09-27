@@ -1,4 +1,5 @@
-#include <projector/threephase/ThreephaseProjector.h>
+#include <projector/ProjectorFactory.h>
+#include <projector/Projector.h>
 #include <common/Config.h>
 
 #include <string>
@@ -10,11 +11,8 @@ int main(int argc, char* argv[]) {
 	std::string confFilepath = argc > 2 ? argv[2] : "threescanner.json";
 	std::string confChildname = argc > 3 ? argv[3] : "projector";
 	Config cfg = Config(confFilepath).getChild(confChildname);
-	if (type == "threephase") {
-		ThreephaseProjector prj(cfg);
-		auto fut = prj.start();
-		fut.wait();
-		return 0;
-	}
+	ProjectorPtr projector = ProjectorFactory::create(type, cfg);
+	auto fut = projector->start();
+	fut.wait();
 	return 0;
 }
