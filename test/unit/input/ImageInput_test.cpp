@@ -7,13 +7,3 @@
 using namespace ::threescanner;
 using namespace ::testing;
 
-TEST(ImageInput_, CanInstantiateFsType) {
-	Config cfg = Config("fsInput.json");
-	ASSERT_NO_THROW(ImageInput::create("fs", cfg));
-}
-
-TEST(ImageInput_, CanInstantiateWithTypeSpecifiedInConfig) {
-	Config cfg = Config("fsInput.json");
-	cfg.set<std::string>("type", "fs");
-	ASSERT_NO_THROW(ImageInput::create(cfg));
-}
