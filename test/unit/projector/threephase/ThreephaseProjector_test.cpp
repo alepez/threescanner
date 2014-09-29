@@ -9,18 +9,51 @@
 using namespace ::threescanner;
 using namespace ::testing;
 
-class ThreephaseProjectorInstance: public testing::Test {
+class AThreephaseProjector: public testing::Test {
 public:
 	Config cfg { Config("threescanner.json").getChild("projector") };
 	ThreephaseProjector projector { (cfg) };
 };
 
-TEST_F(ThreephaseProjectorInstance, CanShowPhases) {
-	projector.setParameter("orientation", "h");
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+class ARunningThreephaseProjector: public testing::Test {
+public:
+	Config cfg { Config("threescanner.json").getChild("projector") };
+	ThreephaseProjector projector { (cfg) };
+	void SetUp() {
+		logDebug("projector.start()");
+		prjFuture = projector.start();
+		projector.waitUntilReady();
+	}
+	void TearDown() {
+		projector.stop();
+	}
+	std::future<void> prjFuture;
+};
+
+TEST_F(ARunningThreephaseProjector, BecomesReadyAfterSomeTimeWhenOrientationChanges) {
+	static const int TIMEOUT_MS = 1000;
+	bool ready = false;
+	auto fut = std::async(std::launch::async, [&]() {
+		std::string orientation = "h";
+		projector.setParameter("orientation", orientation);
+		ASSERT_NO_THROW(projector.waitUntilReady());
+		ready = true;
+	});
+	fut.wait_for(std::chrono::milliseconds(TIMEOUT_MS));
+	ASSERT_TRUE(ready);
+}
+
+TEST_F(ARunningThreephaseProjector, BecomesReadyAfterSomeTimeWhenPhaseChanges) {
+	static const int TIMEOUT_MS = 1000;
 	for (int phase = 1; phase <= 3; ++phase) {
-		logDebug("Scan phase %i", phase);
-		projector.setParameter("phase", fmt::sprintf("%i", phase));
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		bool ready = false;
+		auto fut = std::async(std::launch::async, [&]() {
+			std::string orientation = "h";
+			projector.setParameter("phase", fmt::sprintf("%i", phase));
+			ASSERT_NO_THROW(projector.waitUntilReady());
+			ready = true;
+		});
+		fut.wait_for(std::chrono::milliseconds(TIMEOUT_MS));
+		ASSERT_TRUE(ready);
 	}
 }

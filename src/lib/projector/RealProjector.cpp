@@ -82,6 +82,7 @@ void RealProjector::setupWindow(const Config& cfg) {
 }
 
 void RealProjector::run() {
+	logDebug("void RealProjector::run()");
 	if (!glfwInit()) {
 		throw std::runtime_error("Failed to initialize GLFW");
 	}
