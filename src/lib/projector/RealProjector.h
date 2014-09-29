@@ -15,6 +15,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <future>
+#include <queue>
 
 struct GLFWwindow;
 
@@ -31,9 +32,16 @@ public:
 	virtual bool isReady() const override;
 protected:
 	GLuint getProgramID();
+	/**
+	 * Push a function that will run in the OpenGL thread.
+	 * Why? GL functions, like glUniform* must run in the same
+	 * thread as OpenGL.
+	 */
+	void pushChange(std::function<void()>);
 private:
 	void setupWindow(const Config& cfg);
 	void render();
+	void applyChanges();
 	const Config* cfg_;
 	GLFWwindow* window_;
 	Quad* quad_;
@@ -42,6 +50,7 @@ private:
 	int windowWidth_;
 	int windowHeight_;
 	bool ready_;
+	std::queue<std::function<void()>> changesQueue_;
 };
 
 } /* namespace threescanner */

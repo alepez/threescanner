@@ -82,7 +82,6 @@ void RealProjector::setupWindow(const Config& cfg) {
 }
 
 void RealProjector::run() {
-	logDebug("void RealProjector::run()");
 	if (!glfwInit()) {
 		throw std::runtime_error("Failed to initialize GLFW");
 	}
@@ -90,11 +89,11 @@ void RealProjector::run() {
 	quad_ = new Quad();
 	programID_ = Shaders::get(engineType_);
 	glfwSetInputMode(window_, GLFW_STICKY_KEYS, GL_TRUE);
-	logDebug("Projector is ready");
 	ready_ = true;
 	do {
 		this->syncComm();
 		this->render();
+		this->applyChanges();
 	} while ((glfwGetKey(window_, GLFW_KEY_ESCAPE) != GLFW_PRESS) && (!glfwWindowShouldClose(window_)) && !closeWindow_);
 
 	Shaders::destroy(programID_);
@@ -135,6 +134,19 @@ std::future<void> RealProjector::start() {
 	return std::async(std::launch::async, [this]() {
 		this->run();
 	});
+}
+
+void RealProjector::pushChange(std::function<void()> change) {
+	changesQueue_.push(change);
+}
+
+void RealProjector::applyChanges() {
+	if (changesQueue_.empty()) {
+		return;
+	}
+	auto nextChange = changesQueue_.front();
+	nextChange();
+	changesQueue_.pop();
 }
 
 void RealProjector::stop() {

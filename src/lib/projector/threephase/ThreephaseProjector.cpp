@@ -29,12 +29,14 @@ void ThreephaseProjector::setParameter(const std::string& key, const std::string
 	if (key == "orientation") {
 		if (value[0] == 'V' || value[0] == 'v') {
 			logDebug("Change orientation to VERTICAL");
-			/* TODO: glUniform1i must be called in graphic thread */
-//			glUniform1i(glGetUniformLocation(programID, "orientation"), VERTICAL);
+			this->pushChange([programID]() {
+				glUniform1i(glGetUniformLocation(programID, "orientation"), VERTICAL);
+			});
 		} else if (value[0] == 'H' || value[0] == 'h') {
 			logDebug("Change orientation to HORIZONTAL");
-			/* TODO: glUniform1i must be called in graphic thread */
-//			glUniform1i(glGetUniformLocation(programID, "orientation"), HORIZONTAL);
+			this->pushChange([programID]() {
+				glUniform1i(glGetUniformLocation(programID, "orientation"), HORIZONTAL);
+			});
 		} else {
 			logError("Invalid orientation: " + value);
 			/* do not throw exception */
@@ -43,14 +45,15 @@ void ThreephaseProjector::setParameter(const std::string& key, const std::string
 	}
 	if (key == "phase") {
 		logDebug("Change phase to " + value);
-		/* TODO: glUniform1i must be called in graphic thread */
-//		glUniform1f(glGetUniformLocation(programID, "phase"), boost::lexical_cast<float>(value));
+		this->pushChange([value, programID]() {
+			glUniform1f(glGetUniformLocation(programID, "phase"), boost::lexical_cast<float>(value));
+		});
 		return this->delayChangeAccepted();
 	}
 }
 
 void ThreephaseProjector::delayChangeAccepted() {
-	static const int DELAY_MS = 500;
+	static const int DELAY_MS = 250;
 	changeAcceptedFuture_ = std::async(std::launch::async, [&]() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_MS));
 		changeAccepted_ = true;

@@ -30,21 +30,9 @@ public:
 	std::future<void> prjFuture;
 };
 
-TEST_F(ARunningThreephaseProjector, BecomesReadyAfterSomeTimeWhenOrientationChanges) {
-	static const int TIMEOUT_MS = 1000;
-	bool ready = false;
-	auto fut = std::async(std::launch::async, [&]() {
-		std::string orientation = "h";
-		projector.setParameter("orientation", orientation);
-		ASSERT_NO_THROW(projector.waitUntilReady());
-		ready = true;
-	});
-	fut.wait_for(std::chrono::milliseconds(TIMEOUT_MS));
-	ASSERT_TRUE(ready);
-}
-
 TEST_F(ARunningThreephaseProjector, BecomesReadyAfterSomeTimeWhenPhaseChanges) {
 	static const int TIMEOUT_MS = 1000;
+	projector.setParameter("orientation", "h");
 	for (int phase = 1; phase <= 3; ++phase) {
 		bool ready = false;
 		auto fut = std::async(std::launch::async, [&]() {
