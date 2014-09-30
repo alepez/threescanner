@@ -16,7 +16,7 @@ so they can reside in different computers.
 *Scanner* and *projector* are implementation-agnostic, so different algorithms can
 be used .
 
-At the moment, only [*ThreePhase* by *Kyle McDonald*](https://code.google.com/p/structured-light/)
+At the moment, only [ThreePhase by Kyle McDonald](https://code.google.com/p/structured-light/)
 algorithm is implemented, but it's possible to add [other implementations](https://sites.google.com/site/structuredlight/techniques),
 like *binary codes*, *gray codes* etc...
 
@@ -24,7 +24,6 @@ like *binary codes*, *gray codes* etc...
 
 What to do to have a working scanner:
 
- - input from camera (with opencv)
  - threephase: syncronization between scanner (camera) and projector
  - a GUI
 
@@ -40,6 +39,14 @@ What to do to have a working scanner:
 To build:
 
     make thirdparty # download and build dependencies
+    make
+
+If you want to build documentation, tests, examples etc... you need:
+
+ - [Doxygen]()
+ - [Google C++ Testing Framework](http://code.google.com/p/googletest/)
+ - [Google's C++ mocking framework](http://code.google.com/p/googlemock/)
+
     make all
 
 ## Development
@@ -48,19 +55,26 @@ Build debug version:
 
     make DEBUG=1 all
 
-Test scripts are in `test/scripts/` and automatic tests start with `auto_`.  
+**Test scripts** are in `test/scripts/` and automatic tests start with `auto_`.  
 Automatic tests can be called with `make test`.
 
-Unit tests are in `test/unit` and can be called with `make unit_test`.  
+**Unit tests** are in `test/unit` and can be called with `make unit_test`.  
 You need to install [gmock](https://code.google.com/p/googlemock/) first. 
 
 ## What is structured light?
 
-Structured light is a method of 3D scanning where we project a known pattern onto an unknown surface and by analyzing the deformation (warping) of the known pattern we can mathematically reconstruct the surface virtually. 
+Structured light is a method of 3D scanning where we project a known pattern onto an unknown surface and by analyzing 
+the deformation (warping) of the known pattern we can mathematically reconstruct the surface virtually. 
 
-Imagine a room full of perfectly matte white objects. If you put a projector and a camera in the room, and project a pattern such that every column (or row) has a unique color, then you can create a correspondence between what the projector "sees", and what the camera sees. This correspondence allows you to triangulate the position of every projected pixel and determine its depth. If you project one frame for every frame the camera captures, you can extrapolate 3D information at your camera's framerate.
+Imagine a room full of perfectly matte white objects. If you put a projector and a camera in the room, and project a 
+pattern such that every column (or row) has a unique color, then you can create a correspondence between what the 
+projector "sees", and what the camera sees. This correspondence allows you to triangulate the position of every projected 
+pixel and determine its depth. If you project one frame for every frame the camera captures, you can extrapolate 3D 
+information at your camera's framerate.
 
-Unfortunately, rooms are not generally filled with matte white objects. Whats more, camera-projector synchronization can be difficult outside of hardware, and most cameras distort the scene to some degree. But there are lots of techniques for projecting more information onto the scene in order to overcome these limitations.
+Unfortunately, rooms are not generally filled with matte white objects. Whats more, camera-projector synchronization can 
+be difficult outside of hardware, and most cameras distort the scene to some degree. But there are lots of techniques 
+for projecting more information onto the scene in order to overcome these limitations.
 
 ### References:
 
