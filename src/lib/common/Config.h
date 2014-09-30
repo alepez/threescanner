@@ -33,22 +33,28 @@ public:
 	 * Destructor
 	 */
 	virtual ~Config();
+
 	/**
 	 * Getter with default value
+	 *
 	 * \param path the path where the value is stored. We construct the path by separating
-   *     the individual keys with dots.
-   * \param defaultValue the default value to return if none is found at the specified path
-   * \return the value if found, otherwise defaultValue
+	 * the individual keys with dots.
+	 *
+	 * \param defaultValue the default value to return if none is found at the specified path
+	 *
+	 * \return the value if found, otherwise defaultValue
 	 */
 	template<typename T> T get(const std::string& path, T defaultValue) const {
 		return pt_.get<T>(path, defaultValue);
 	}
 	/**
 	 * Getter without default value
+	 *
 	 * \param path the path where the value is stored. We construct the path by separating
-   *     the individual keys with dots.
-   * \return the value if found
-   *
+	 * the individual keys with dots.
+	 *
+	 * \return the value if found
+	 *
 	 */
 	template<typename T> T get(const std::string& path) const {
 		return pt_.get<T>(path);

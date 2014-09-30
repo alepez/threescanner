@@ -12,7 +12,15 @@
 
 namespace threescanner {
 
+/**
+ * Images are handled by cv::Mat (OpenCV)
+ * \see http://docs.opencv.org/modules/core/doc/basic_structures.html
+ */
 typedef cv::Mat Image;
+
+/**
+ * Shared pointer to Image
+ */
 typedef std::shared_ptr<Image> ImagePtr;
 
 }
