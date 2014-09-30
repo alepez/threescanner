@@ -47,6 +47,8 @@ If you want to build documentation, tests, examples etc... you need:
  - [Google C++ Testing Framework](http://code.google.com/p/googletest/)
  - [Google's C++ mocking framework](http://code.google.com/p/googlemock/)
 
+Then you can build with:
+
     make all
 
 ## Development
